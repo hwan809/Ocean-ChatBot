@@ -14,8 +14,11 @@ from langchain.chains.query_constructor.base import (
 )
 
 from langchain.chains import RetrievalQA
-
 openai_api_key = st.secrets['OPENAI_API_KEY']
+
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 # Set OpenAI API key
 llm = ChatOpenAI(model_name="gpt-4o", temperature=0.5, openai_api_key=openai_api_key)
