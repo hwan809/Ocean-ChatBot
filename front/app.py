@@ -15,11 +15,9 @@ from langchain.chains.query_constructor.base import (
 
 from langchain.chains import RetrievalQA
 
-import os
-
 # Set OpenAI API key
-os.environ["OPENAI_API_KEY"] = 'sk-proj-dhAlzDfgDr0iXfpSY0FFT3BlbkFJEfXrDcih67saFa4qCMzd'  # 실제 사용 시 안전한 방법으로 API 키를 설정해야 합니다
-llm = ChatOpenAI(model_name="gpt-4o", temperature=0.5)
+openai_api_key = st.environ["OPENAI_API_KEY"]
+llm = ChatOpenAI(model_name="gpt-4o", temperature=0.5, openai_api_key=openai_api_key)
 
 # Function to setup RAG pipeline
 @st.cache_resource
