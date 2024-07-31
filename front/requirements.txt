@@ -5,4 +5,3 @@ langchain_community
 langchain_chroma
 lark
 pysqlite3
-pysqlite3-binary
