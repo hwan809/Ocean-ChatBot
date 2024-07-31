@@ -15,8 +15,9 @@ from langchain.chains.query_constructor.base import (
 
 from langchain.chains import RetrievalQA
 
+openai_api_key = st.secrets['OPENAI_API_KEY']
+
 # Set OpenAI API key
-openai_api_key = st.environ["OPENAI_API_KEY"]
 llm = ChatOpenAI(model_name="gpt-4o", temperature=0.5, openai_api_key=openai_api_key)
 
 # Function to setup RAG pipeline
@@ -54,7 +55,7 @@ st.header("2024 Ocean ICT 챗봇 도우미")
 
 vectorstore = Chroma(
     persist_directory="db/chroma_2023_pdfs",
-    embedding_function=OpenAIEmbeddings()
+    embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key)
 )
 
 metadata_field_info = [
@@ -128,8 +129,6 @@ output_parser = StructuredQueryOutputParser.from_components()
 
 # 프롬프트, 언어 모델, 출력 파서를 연결하여 쿼리 생성기를 만듭니다.
 new_query_constructor = prompt | llm | output_parser
-
-llm = ChatOpenAI(model_name="gpt-4o", temperature=0, openai_api_key='sk-proj-dhAlzDfgDr0iXfpSY0FFT3BlbkFJEfXrDcih67saFa4qCMzd')
 
 self_query_retriever = SelfQueryRetriever(
     query_constructor=new_query_constructor,
