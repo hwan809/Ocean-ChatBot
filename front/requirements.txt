@@ -1,0 +1,7 @@
+langchain
+langchain_core
+langchain_openai
+langchain_community
+langchain_chroma
+os
+lark

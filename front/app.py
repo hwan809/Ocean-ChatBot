@@ -1,67 +1,155 @@
 import streamlit as st
-from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import CharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain_community.vectorstores import FAISS
+
+from langchain_core.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+
+from langchain.retrievers.self_query.chroma import ChromaTranslator
+from langchain_chroma import Chroma
+from langchain.chains.query_constructor.base import AttributeInfo
+from langchain.retrievers.self_query.base import SelfQueryRetriever
+
+from langchain.chains.query_constructor.base import (
+    StructuredQueryOutputParser,
+    get_query_constructor_prompt,
+)
+
 from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+
 import os
 
 # Set OpenAI API key
-os.environ["OPENAI_API_KEY"] = "ㄴㅁㅇㄻㄴㅇㄹ"  # 실제 사용 시 안전한 방법으로 API 키를 설정해야 합니다
-
-# Function to load and process PDF
-@st.cache_resource
-def load_and_process_pdf(pdf_path):
-    loader = PyPDFLoader(pdf_path)
-    documents = loader.load()
-
-    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-    texts = text_splitter.split_documents(documents)
-
-    embeddings = OpenAIEmbeddings()
-    vectorstore = FAISS.from_documents(texts, embeddings)
-
-    return vectorstore
-
+os.environ["OPENAI_API_KEY"] = 'sk-proj-dhAlzDfgDr0iXfpSY0FFT3BlbkFJEfXrDcih67saFa4qCMzd'  # 실제 사용 시 안전한 방법으로 API 키를 설정해야 합니다
+llm = ChatOpenAI(model_name="gpt-4o", temperature=0.5)
 
 # Function to setup RAG pipeline
 @st.cache_resource
-def setup_rag_pipeline(_vectorstore):
-    prompt_template = """다음 맥락을 사용하여 주어진 질문에 대해 한국어로 답변해주세요. 
-    만약 답을 모르겠다면, 모른다고 솔직히 말하고 추측하지 마세요.
+def setup_rag_pipeline(_retriever):
+    prompt = PromptTemplate.from_template(
+    """당신은 부산과학고등학교의 행사 "Ocean ICT"의 도우미 챗봇인 "한바다" 입니다.
+    검색된 정보를 사용하여 질문에 답합니다.
+    팀 코드는 대문자와 숫자 두 자리의 조합입니다.
+    팀에 대한 정보를 언급할 때 반드시 팀 코드를 같이 말하세요.
+    답을 모른다면 그냥 너의 정보와 함께 너는 Ocean ICT에 대해서만 답변할 수 있다고 말하면 됩니다.
+    답을 안다면 있는 정보를 사용해 최대한 자세하게 답변할 수 있도록 합니다. 여러 줄에 걸쳐서 답변하세요.
+    한국어로 친절하고, 친근하게 답하세요.
 
+    #질문:
+    {question}
+    #정보:
     {context}
 
-    질문: {question}
-    한국어 답변:"""
-    PROMPT = PromptTemplate(
-        template=prompt_template, input_variables=["context", "question"]
+    #답변:"""
     )
-
-    chain_type_kwargs = {"prompt": PROMPT}
-
-    llm = ChatOpenAI(temperature=0.7, model_name="gpt-3.5-turbo")
 
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
-        retriever=_vectorstore.as_retriever(),
-        chain_type_kwargs=chain_type_kwargs
+        retriever=_retriever,
     )
 
     return qa_chain
 
 
 # Streamlit UI
-st.title("학사 관리 챗봇")
+st.title("한바다 🐋")
+st.header("2024 Ocean ICT 챗봇 도우미")
 
-# Load and process the pre-saved PDF
-pdf_path = "data/academic_rules.pdf"
-vectorstore = load_and_process_pdf(pdf_path)
+vectorstore = Chroma(
+    persist_directory="db/chroma_2023_pdfs",
+    embedding_function=OpenAIEmbeddings()
+)
+
+metadata_field_info = [
+    AttributeInfo(
+        name="Team code",
+        description="Unique code that the team has. alphabetical uppercase + double digit combination.",
+        type="string",
+    ),
+    AttributeInfo(
+        name="Title",
+        description="the topic that the team studied/made",
+        type="string",
+    ),
+    AttributeInfo(
+        name="Teammate #1 name",
+        description="A team member's name. name is two or three letters of Hangul.",
+        type="string"
+    ),
+
+    AttributeInfo(
+        name="Teammate #1 number",
+        description="A team member's student number. The student number is four digits.",
+        type="string"
+    ),
+    AttributeInfo(
+        name="Teammate #2 name",
+        description="A team member's name. name is two or three letters of Hangul.",
+        type="string"
+    ),
+
+    AttributeInfo(
+        name="Teammate #2 number",
+        description="A team member's student number. The student number is four digits.",
+        type="string"
+    )
+]
+
+examples = [
+    (
+        "A23 팀?",
+        {
+            "query": "작품 설명서",
+            "filter": 'eq("Team code", "A23")',
+        },
+    ),
+    (
+        "이동윤은 뭐했어?",
+        {
+            "query": "작품 설명서",
+            "filter": 'or(eq("Teammate #1 name", "이동윤"), eq("Teammate #2 name", "이동윤"))',
+        },
+    ),
+    (
+        "환경에 관한 주제로 연구한 팀을 알려줄래?",
+        {
+            "query": "환경에 관한 주제로 연구한 팀을 알려줄래?",
+            "filter": "NO_FILTER",
+        }   
+    )
+]
+
+# 문서 내용 설명과 메타데이터 필드 정보를 사용하여 쿼리 생성기 프롬프트를 가져옵니다.
+prompt = get_query_constructor_prompt(
+    'Ocean ICT 대회에 참가한 팀의 작품 설명서.',
+    metadata_field_info,
+    examples=examples
+)
+
+# 구성 요소에서 구조화된 쿼리 출력 파서를 생성합니다.
+output_parser = StructuredQueryOutputParser.from_components()
+
+# 프롬프트, 언어 모델, 출력 파서를 연결하여 쿼리 생성기를 만듭니다.
+new_query_constructor = prompt | llm | output_parser
+
+llm = ChatOpenAI(model_name="gpt-4o", temperature=0, openai_api_key='sk-proj-dhAlzDfgDr0iXfpSY0FFT3BlbkFJEfXrDcih67saFa4qCMzd')
+
+self_query_retriever = SelfQueryRetriever(
+    query_constructor=new_query_constructor,
+    vectorstore=vectorstore,
+    structured_query_translator=ChromaTranslator()
+)
+
+from langchain.retrievers import EnsembleRetriever
+
+# 앙상블 retriever를 초기화합니다.
+ensemble_retriever = EnsembleRetriever(
+    retrievers=[self_query_retriever, vectorstore.as_retriever()],
+    weights=[0.5, 0.5],
+    search_type="mmr",
+)
 
 # Setup RAG pipeline
-qa_chain = setup_rag_pipeline(vectorstore)
+qa_chain = setup_rag_pipeline(ensemble_retriever)
 
 # Chat interface
 if "messages" not in st.session_state:
