@@ -4,3 +4,4 @@ langchain_openai
 langchain_community
 langchain_chroma
 lark
+streamlit >= 1.9.2
