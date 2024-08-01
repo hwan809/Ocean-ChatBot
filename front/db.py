@@ -8,12 +8,8 @@ class GooglesheetUtils:
     def __init__(self) -> None:
 
         service_account_json = st.secrets["spreadsheet"]['service_account']
-
-        print(type(service_account_json))
-
-        service_account_info = json.load()
         self.credentials = service_account.Credentials.from_service_account_info(
-            service_account_info,
+            service_account_json,
             scopes = ['https://www.googleapis.com/auth/spreadsheets']
         )
 
