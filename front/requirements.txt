@@ -4,4 +4,3 @@ langchain_openai
 langchain_community
 langchain_chroma
 lark
-pysqlite3
