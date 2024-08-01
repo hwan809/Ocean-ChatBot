@@ -12,11 +12,6 @@ class GooglesheetUtils:
             service_account_json,
             scopes = ['https://www.googleapis.com/auth/spreadsheets']
         )
-
-        self.credentials = service_account.Credentials.from_service_account_file(
-            'front/service_account.json',
-            scopes = ['https://www.googleapis.com/auth/spreadsheets']
-        )
         self.service = discovery.build('sheets', 'v4', credentials=self.credentials)
     def append_data(self, values, range_name) -> None:
         print(self.spreadsheet_id)
