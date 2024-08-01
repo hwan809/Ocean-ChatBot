@@ -5,3 +5,5 @@ langchain_community
 langchain-chroma
 lark
 pysqlite3-binary
+streamlit==1.28.1
+chromadb==0.4.17
