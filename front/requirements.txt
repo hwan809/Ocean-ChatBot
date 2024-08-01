@@ -5,3 +5,4 @@ langchain_community
 langchain-chroma
 lark
 pysqlite3-binary
+st-gsheets-connection

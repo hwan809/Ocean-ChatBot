@@ -12,6 +12,9 @@ from langchain_chroma import Chroma
 from langchain.chains.query_constructor.base import AttributeInfo
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 
+from streamlit_gsheets import GSheetsConnection
+conn = st.connection("gsheets", type=GSheetsConnection)
+
 from langchain.chains.query_constructor.base import (
     StructuredQueryOutputParser,
     get_query_constructor_prompt,
@@ -185,3 +188,4 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(response['result'])
 
     st.session_state.messages.append({"role": "assistant", "content": response['result']})
+    conn.append_row([prompt, response['result']])
