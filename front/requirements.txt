@@ -4,5 +4,5 @@ langchain_openai
 langchain_community
 langchain-chroma
 lark
-pysqlite-binary
+pysqlite3-binary
 st-gsheets-connection
