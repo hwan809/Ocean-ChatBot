@@ -1,4 +1,5 @@
 import streamlit as st
+from db import GooglesheetUtils
 
 __import__('pysqlite3')
 import sys
@@ -11,9 +12,6 @@ from langchain.retrievers.self_query.chroma import ChromaTranslator
 from langchain_chroma import Chroma
 from langchain.chains.query_constructor.base import AttributeInfo
 from langchain.retrievers.self_query.base import SelfQueryRetriever
-
-from streamlit_gsheets import GSheetsConnection
-conn = st.connection("gsheets", type=GSheetsConnection)
 
 from langchain.chains.query_constructor.base import (
     StructuredQueryOutputParser,
@@ -170,6 +168,8 @@ ensemble_retriever = EnsembleRetriever(
 # Setup RAG pipeline
 qa_chain = setup_rag_pipeline(ensemble_retriever)
 
+googlesheet = GooglesheetUtils()
+
 # Chat interface
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -188,4 +188,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(response['result'])
 
     st.session_state.messages.append({"role": "assistant", "content": response['result']})
-    conn.append_row([prompt, response['result']])
+
+    values = [[prompt, response['result']]]
+    print(values)
+    googlesheet.append_data(values, 'Sheet1!A1')
