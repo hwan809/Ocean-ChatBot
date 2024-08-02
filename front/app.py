@@ -6,6 +6,8 @@ import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 from langchain.retrievers.self_query.chroma import ChromaTranslator
@@ -48,14 +50,14 @@ def setup_rag_pipeline(_retriever):
     #답변:"""
     )
 
-    qa_chain = RetrievalQA.from_chain_type(
-        prompt=prompt,
-        llm=llm,
-        chain_type="stuff",
-        retriever=_retriever,
+    chain = (
+    {"context": ensemble_retriever, "question": RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
     )
 
-    return qa_chain
+    return chain
 
 
 # Streamlit UI
@@ -188,10 +190,10 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     with st.chat_message("assistant"):
         response = qa_chain.invoke(prompt)
-        st.markdown(response['result'])
+        st.markdown(response)
 
-    st.session_state.messages.append({"role": "assistant", "content": response['result']})
+    st.session_state.messages.append({"role": "assistant", "content": response})
 
-    values = [[prompt, response['result']]]
+    values = [[prompt, response]]
     print(values)
     googlesheet.append_data(values, 'Sheet1!A1')
