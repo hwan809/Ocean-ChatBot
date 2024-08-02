@@ -22,7 +22,7 @@ from langchain.chains import RetrievalQA
 openai_api_key = st.secrets['OPENAI_API_KEY']
 
 # Set OpenAI API key
-llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0.5, openai_api_key=openai_api_key)
+llm = ChatOpenAI(model_name="gpt-4o", temperature=0.5, openai_api_key=openai_api_key)
 
 # Function to setup RAG pipeline
 @st.cache_resource
