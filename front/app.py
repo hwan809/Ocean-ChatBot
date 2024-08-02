@@ -49,6 +49,7 @@ def setup_rag_pipeline(_retriever):
     )
 
     qa_chain = RetrievalQA.from_chain_type(
+        prompt=prompt,
         llm=llm,
         chain_type="stuff",
         retriever=_retriever,
@@ -140,7 +141,7 @@ examples = [
 ]
 
 # 문서 내용 설명과 메타데이터 필드 정보를 사용하여 쿼리 생성기 프롬프트를 가져옵니다.
-prompt = get_query_constructor_prompt(
+query_prompt = get_query_constructor_prompt(
     'Ocean ICT 대회에 참가한 팀의 작품 설명서.',
     metadata_field_info,
     examples=examples
@@ -150,7 +151,7 @@ prompt = get_query_constructor_prompt(
 output_parser = StructuredQueryOutputParser.from_components()
 
 # 프롬프트, 언어 모델, 출력 파서를 연결하여 쿼리 생성기를 만듭니다.
-new_query_constructor = prompt | llm | output_parser
+new_query_constructor = query_prompt | llm | output_parser
 
 self_query_retriever = SelfQueryRetriever(
     query_constructor=new_query_constructor,
