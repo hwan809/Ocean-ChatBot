@@ -45,6 +45,7 @@ def setup_rag_pipeline(_retriever):
     #질문:
     {question}
     #정보:
+    2023년의 Ocean ICT에는 총 86팀이 참가하였다. 다음은 참가한 팀들의 포스터 중 질문과 관계된 일부이다.
     {context}
 
     #답변:"""
