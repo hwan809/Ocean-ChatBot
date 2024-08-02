@@ -147,7 +147,8 @@ examples = [
 query_prompt = get_query_constructor_prompt(
     'Ocean ICT 대회에 참가한 팀의 작품 설명서.',
     metadata_field_info,
-    examples=examples
+    examples=examples,
+    search_kwargs={"k": 5}
 )
 
 # 구성 요소에서 구조화된 쿼리 출력 파서를 생성합니다.
@@ -159,7 +160,8 @@ new_query_constructor = query_prompt | llm | output_parser
 self_query_retriever = SelfQueryRetriever(
     query_constructor=new_query_constructor,
     vectorstore=vectorstore,
-    structured_query_translator=ChromaTranslator()
+    structured_query_translator=ChromaTranslator(),
+    search_kwargs={"k": 5}
 )
 
 from langchain.retrievers import EnsembleRetriever
