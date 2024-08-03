@@ -1,5 +1,6 @@
 import streamlit as st
 from db import GooglesheetUtils
+import datetime
 
 __import__('pysqlite3')
 import sys
@@ -189,6 +190,8 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     st.session_state.messages.append({"role": "assistant", "content": response['result']})
 
-    values = [[prompt, response['result']]]
+    now = datetime.datetime.now()
+
+    values = [[now.strftime("%Y-%m-%d %H:%M:%S"),prompt, response['result']]]
     print(values)
     googlesheet.append_data(values, 'Sheet1!A1')
