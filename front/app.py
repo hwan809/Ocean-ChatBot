@@ -193,7 +193,8 @@ if prompt := st.chat_input("질문을 입력하세요"):
     st.session_state.messages.append({"role": "assistant", "content": response['result']})
 
     now = datetime.datetime.now()
+    timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
-    values = [[now.strftime("%Y-%m-%d %H:%M:%S"),prompt, response['result']]]
+    values = [[prompt, response['result'], timestamp]]
     print(values)
     googlesheet.append_data(values, 'Sheet1!A1')
