@@ -9,6 +9,8 @@ sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 #import sqlite3
 
 from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 from langchain.retrievers.self_query.chroma import ChromaTranslator
@@ -25,7 +27,7 @@ from langchain.chains import RetrievalQA
 openai_api_key = st.secrets['OPENAI_API_KEY']
 
 # Set OpenAI API key
-llm = ChatOpenAI(model_name="gpt-4o", temperature=0.5, openai_api_key=openai_api_key)
+llm = ChatOpenAI(model_name="gpt-4o", temperature=0, openai_api_key=openai_api_key)
 
 # Function to setup RAG pipeline
 @st.cache_resource
@@ -37,25 +39,29 @@ def setup_rag_pipeline(_retriever):
     팀에 대한 정보를 언급할 때 반드시 팀 코드를 같이 언급하세요.
     팀 코드는 대문자와 숫자 두 자리의 조합입니다.
 
-    답을 모른다면 그냥 너의 정보와 함께 너는 Ocean ICT에 대해서만 답변할 수 있다고 말하면 됩니다.
-    답을 안다면 있는 정보를 사용해 최대한 자세하게 답변할 수 있도록 합니다. 여러 줄에 걸쳐서 답변하세요.
-    한국어로 친절하고, 친근하게 답하세요.
+    답을 모른다면 그냥 당신의 정보에 대해 언급하고,
+    Ocean ICT에 대해서만 답변할 수 있다고 말하면 됩니다.
+    
+    답을 안다면 있는 정보를 사용해 최대한 자세하게 답변할 수 있도록 하되, 자신의 소개는 할 필요가 없습니다. 여러 줄에 걸쳐서 답변하세요.
+    한국어로 친절하고, 친근하게 답하십시오.
 
     #질문:
     {question}
     #정보:
+    2023년의 Ocean ICT에는 총 86팀이 참가하였다. 다음은 참가한 팀들의 포스터 중 질문과 관계된 일부이다.
     {context}
 
     #답변:"""
     )
 
-    qa_chain = RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=_retriever,
+    chain = (
+    {"context": ensemble_retriever, "question": RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
     )
 
-    return qa_chain
+    return chain
 
 
 # Streamlit UI
@@ -141,7 +147,7 @@ examples = [
 ]
 
 # 문서 내용 설명과 메타데이터 필드 정보를 사용하여 쿼리 생성기 프롬프트를 가져옵니다.
-prompt = get_query_constructor_prompt(
+query_prompt = get_query_constructor_prompt(
     'Ocean ICT 대회에 참가한 팀의 작품 설명서.',
     metadata_field_info,
     examples=examples
@@ -151,7 +157,7 @@ prompt = get_query_constructor_prompt(
 output_parser = StructuredQueryOutputParser.from_components()
 
 # 프롬프트, 언어 모델, 출력 파서를 연결하여 쿼리 생성기를 만듭니다.
-new_query_constructor = prompt | llm | output_parser
+new_query_constructor = query_prompt | llm | output_parser
 
 self_query_retriever = SelfQueryRetriever(
     query_constructor=new_query_constructor,
@@ -178,23 +184,26 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+    if message["role"] == "assistant":
+        with st.chat_message(name="assistant", avatar='🐋'):
+            st.markdown(message["content"])
+    else:
+        with st.chat_message(name="user"):
+            st.markdown(message["content"])        
 
 if prompt := st.chat_input("질문을 입력하세요"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    with st.chat_message("assistant"):
-        response = qa_chain.invoke(prompt)
-        st.markdown(response['result'])
+    with st.chat_message(name="assistant", avatar='🐋'):
+        stream = qa_chain.stream(prompt)
+        response = st.write_stream(stream)
 
-    st.session_state.messages.append({"role": "assistant", "content": response['result']})
+    st.session_state.messages.append({"role": "assistant", "content": response})
 
     now = datetime.datetime.now()
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
     values = [[prompt, response['result'], timestamp]]
-    print(values)
     googlesheet.append_data(values, 'Sheet1!A1')
