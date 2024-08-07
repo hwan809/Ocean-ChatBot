@@ -204,7 +204,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
         chain_stream = qa_chain.stream(prompt)
         # stream object를 asynchronously 하게 어떻게 주지? 양쪽에다가
         stream.feed(chain_stream)
-        stream.play_async()
+        stream.play()
         response = st.write_stream(chain_stream)
 
     st.session_state.messages.append({"role": "assistant", "content": response})
