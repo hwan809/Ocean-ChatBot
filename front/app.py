@@ -2,11 +2,11 @@ import streamlit as st
 from db import GooglesheetUtils
 import datetime
 
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+# __import__('pysqlite3')
+# import sys
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
-#import sqlite3
+import sqlite3
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -65,7 +65,7 @@ def setup_rag_pipeline(_retriever):
 
 
 # Streamlit UI
-st.title("한바다 🐋")
+st.title("한바다 🐬")
 st.header("2024 Ocean ICT 챗봇 도우미")
 
 vectorstore = Chroma(
