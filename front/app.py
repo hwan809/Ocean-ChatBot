@@ -176,8 +176,12 @@ ensemble_retriever = EnsembleRetriever(
 
 # Setup RAG pipeline
 qa_chain = setup_rag_pipeline(ensemble_retriever)
-
 googlesheet = GooglesheetUtils()
+
+from RealtimeTTS import TextToAudioStream, OpenAIEngine
+
+engine = OpenAIEngine() # replace with your TTS engine
+stream = TextToAudioStream(engine)
 
 # Chat interface
 if "messages" not in st.session_state:
@@ -197,8 +201,11 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(prompt)
 
     with st.chat_message(name="assistant", avatar='🐋'):
-        stream = qa_chain.stream(prompt)
-        response = st.write_stream(stream)
+        chain_stream = qa_chain.stream(prompt)
+        # stream object를 asynchronously 하게 어떻게 주지? 양쪽에다가
+        stream.feed(chain_stream)
+        stream.play_async()
+        response = st.write_stream(chain_stream)
 
     st.session_state.messages.append({"role": "assistant", "content": response})
 
