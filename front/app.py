@@ -54,7 +54,7 @@ def setup_rag_pipeline(_retriever):
     )
 
     chain = (
-    {"context": ensemble_retriever, "question": RunnablePassthrough()}
+    {"question": RunnablePassthrough()}
     | prompt
     | llm
     | StrOutputParser()
@@ -200,12 +200,15 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(prompt)
 
     with st.chat_message(name="assistant", avatar='🐋'):
-        stream = qa_chain.stream(prompt)
-        for result in stream:
-            retrieved_docs = result['source_documents']
-            st.markdown(retrieved_docs)
-        # 여기서 retrieved_docs를 활용할 수 있습니다.
-        response = st.write_stream(result)
+        docs = ensemble_retriever.invoke(prompt)
+
+        stream = qa_chain.stream(
+            {
+                "context": docs,
+                "question": prompt
+            }
+        )
+        response = st.write_stream(stream)
 
     st.session_state.messages.append({"role": "assistant", "content": response})
 
