@@ -53,12 +53,7 @@ def setup_rag_pipeline(_retriever):
     #답변:"""
     )
 
-    chain = (
-    {"question": RunnablePassthrough()}
-    | prompt
-    | llm
-    | StrOutputParser()
-    )
+    chain = prompt | llm | StrOutputParser()
 
     return chain
 
