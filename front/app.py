@@ -180,6 +180,8 @@ ensemble_retriever = EnsembleRetriever(
 qa_chain = setup_rag_pipeline(ensemble_retriever)
 googlesheet = GooglesheetUtils()
 
+youtube_link = ''
+
 # from RealtimeTTS import TextToAudioStream, GTTSEngine
 
 # engine = GTTSEngine()
@@ -214,9 +216,6 @@ if prompt := st.chat_input("질문을 입력하세요"):
         response = st.write_stream(stream)
     
     youtube_link = docs[0].metadata['Youtube link']
-    if st.button('팀 영상 보기'):
-        st.video(youtube_link)
-
     st.session_state.messages.append({"role": "assistant", "content": response})
 
     now = datetime.datetime.now()
@@ -224,3 +223,6 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     values = [[prompt, response, timestamp]]
     googlesheet.append_data(values, 'Sheet1!A1')
+
+    play_video = lambda: st.video(youtube_link)
+    st.button('팀 영상 보기', on_click=play_videp)
