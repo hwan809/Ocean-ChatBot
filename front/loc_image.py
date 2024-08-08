@@ -18,6 +18,3 @@ def get_location_image(team_code):
     base_img.paste(pin_img, location, pin_img)
 
     return base_img
-
-loc_img = get_location_image('B03')
-loc_img.save('test.png')

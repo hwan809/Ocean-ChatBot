@@ -201,7 +201,7 @@ for message in st.session_state.messages:
             st.video(message["content"])    
     elif message["role"] == "image":
         with st.chat_message(name="assistant", avatar='🐋'):
-            st.image(message["content"])    
+            st.image(message["content"], width=360)    
     else:
         with st.chat_message(name="user"):
             st.markdown(message["content"])        
