@@ -208,5 +208,5 @@ if prompt := st.chat_input("질문을 입력하세요"):
     now = datetime.datetime.now()
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
-    values = [[prompt, response['result'], timestamp]]
+    values = [[prompt, response, timestamp]]
     googlesheet.append_data(values, 'Sheet1!A1')
