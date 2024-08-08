@@ -201,9 +201,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     with st.chat_message(name="assistant", avatar='🐋'):
         stream = qa_chain.stream(prompt)
-        audio_stream.feed(stream)
-        audio_stream.play()
-        # response = st.write_stream(stream)
+        response = st.write_stream(stream)
 
     st.session_state.messages.append({"role": "assistant", "content": 'new'})
 
