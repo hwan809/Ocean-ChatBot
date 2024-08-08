@@ -200,8 +200,8 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(prompt)
 
     with st.chat_message(name="assistant", avatar='🐋'):
-        response = qa_chain.stream(prompt)
-        st.write_stream(response)
+        stream = qa_chain.stream(prompt)
+        response = st.write_stream(stream)
 
     st.session_state.messages.append({"role": "assistant", "content": response})
 
