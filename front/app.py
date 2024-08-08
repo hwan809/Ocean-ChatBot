@@ -177,10 +177,10 @@ ensemble_retriever = EnsembleRetriever(
 qa_chain = setup_rag_pipeline(ensemble_retriever)
 googlesheet = GooglesheetUtils()
 
-from RealtimeTTS import TextToAudioStream, GTTSEngine
+# from RealtimeTTS import TextToAudioStream, GTTSEngine
 
-engine = GTTSEngine()
-audio_stream = TextToAudioStream(engine)
+# engine = GTTSEngine()
+# audio_stream = TextToAudioStream(engine)
 
 # Chat interface
 if "messages" not in st.session_state:
