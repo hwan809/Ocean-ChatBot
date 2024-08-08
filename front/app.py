@@ -203,10 +203,10 @@ if prompt := st.chat_input("질문을 입력하세요"):
         stream = qa_chain.stream(prompt)
         response = st.write_stream(stream)
 
-    st.session_state.messages.append({"role": "assistant", "content": 'new'})
+    st.session_state.messages.append({"role": "assistant", "content": response})
 
     now = datetime.datetime.now()
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
-    values = [[prompt, 'new', timestamp]]
+    values = [[prompt, response, timestamp]]
     googlesheet.append_data(values, 'Sheet1!A1')
