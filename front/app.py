@@ -226,14 +226,18 @@ if prompt := st.chat_input("질문을 입력하세요"):
     team_code = docs[0].metadata['Team code']
     st.session_state.messages.append({"role": "assistant", "content": response})
 
+    play_video = lambda: st.session_state.messages.append({"role": "video", "content": youtube_link})
+    show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(team_code)})
+
     now = datetime.datetime.now()
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
     values = [[prompt, response, timestamp]]
     googlesheet.append_data(values, 'Sheet1!A1')
 
-    play_video = lambda: st.session_state.messages.append({"role": "video", "content": youtube_link})
-    st.button('팀 영상 보기', on_click=play_video)
+    col1, col2, col3 = st.columns([1, 1, 10])
 
-    show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(team_code)})
-    st.button('팀 위치 보기', on_click=show_loc_img)
+    with col1:
+        st.button('팀 영상 보기', on_click=play_video)
+    with col2:
+        st.button('팀 위치 보기', on_click=show_loc_img)
