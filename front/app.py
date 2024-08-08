@@ -195,6 +195,9 @@ for message in st.session_state.messages:
     if message["role"] == "assistant":
         with st.chat_message(name="assistant", avatar='🐋'):
             st.markdown(message["content"])
+    elif message["role"] == "video":
+        with st.chat_message(name="assistant", avatar='🐋'):
+            st.video(message["content"])        
     else:
         with st.chat_message(name="user"):
             st.markdown(message["content"])        
@@ -224,5 +227,5 @@ if prompt := st.chat_input("질문을 입력하세요"):
     values = [[prompt, response, timestamp]]
     googlesheet.append_data(values, 'Sheet1!A1')
 
-    play_video = lambda: st.video(youtube_link)
+    play_video = lambda: st.session_state.messages.append({"role": "video", "content": youtube_link})
     st.button('팀 영상 보기', on_click=play_video)
