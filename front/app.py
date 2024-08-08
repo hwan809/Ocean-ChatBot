@@ -1,5 +1,6 @@
 import streamlit as st
 from db import GooglesheetUtils
+from loc_image import get_location_image
 import datetime
 
 __import__('pysqlite3')
@@ -197,7 +198,10 @@ for message in st.session_state.messages:
             st.markdown(message["content"])
     elif message["role"] == "video":
         with st.chat_message(name="assistant", avatar='🐋'):
-            st.video(message["content"])        
+            st.video(message["content"])    
+    elif message["role"] == "image":
+        with st.chat_message(name="assistant", avatar='🐋'):
+            st.image(message["content"])    
     else:
         with st.chat_message(name="user"):
             st.markdown(message["content"])        
@@ -219,6 +223,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
         response = st.write_stream(stream)
     
     youtube_link = docs[0].metadata['Youtube link']
+    team_code = docs[0].metadata['Team code']
     st.session_state.messages.append({"role": "assistant", "content": response})
 
     now = datetime.datetime.now()
@@ -229,3 +234,6 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     play_video = lambda: st.session_state.messages.append({"role": "video", "content": youtube_link})
     st.button('팀 영상 보기', on_click=play_video)
+
+    show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(team_code)})
+    st.button('팀 위치 보기', on_click=show_loc_img)
