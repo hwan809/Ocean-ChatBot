@@ -201,8 +201,11 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     with st.chat_message(name="assistant", avatar='🐋'):
         stream = qa_chain.stream(prompt)
-        response = st.write_stream(stream)
-        print(response)
+        for result in stream:
+            retrieved_docs = result['source_documents']
+            st.markdown(retrieved_docs)
+        # 여기서 retrieved_docs를 활용할 수 있습니다.
+        response = st.write_stream(result)
 
     st.session_state.messages.append({"role": "assistant", "content": response})
 
