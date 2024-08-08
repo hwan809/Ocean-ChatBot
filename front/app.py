@@ -23,7 +23,6 @@ from langchain.chains.query_constructor.base import (
     get_query_constructor_prompt,
 )
 
-from langchain.chains import RetrievalQA
 openai_api_key = st.secrets['OPENAI_API_KEY']
 
 # Set OpenAI API key
@@ -178,10 +177,10 @@ ensemble_retriever = EnsembleRetriever(
 qa_chain = setup_rag_pipeline(ensemble_retriever)
 googlesheet = GooglesheetUtils()
 
-from RealtimeTTS import TextToAudioStream, OpenAIEngine
+# from RealtimeTTS import TextToAudioStream, OpenAIEngine
 
-engine = OpenAIEngine() # replace with your TTS engine
-stream = TextToAudioStream(engine)
+# engine = OpenAIEngine() # replace with your TTS engine
+# stream = TextToAudioStream(engine)
 
 # Chat interface
 if "messages" not in st.session_state:
@@ -201,11 +200,8 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(prompt)
 
     with st.chat_message(name="assistant", avatar='🐋'):
-        chain_stream = qa_chain.stream(prompt)
-        # stream object를 asynchronously 하게 어떻게 주지? 양쪽에다가
-        stream.feed(chain_stream)
-        stream.play()
-        response = st.write_stream(chain_stream)
+        response = qa_chain.stream(prompt)
+        st.write_stream(response)
 
     st.session_state.messages.append({"role": "assistant", "content": response})
 
