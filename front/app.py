@@ -99,6 +99,12 @@ metadata_field_info = [
         name="Teammate #2 number",
         description="A team member's student number. The student number is four digits",
         type="string"
+    ),
+
+    AttributeInfo(
+        name="Youtube link",
+        description="A youtube video link from the team. The vido can be played by clicking on the link.",
+        type="string"
     )
 ]
 
