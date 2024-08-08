@@ -225,4 +225,4 @@ if prompt := st.chat_input("질문을 입력하세요"):
     googlesheet.append_data(values, 'Sheet1!A1')
 
     play_video = lambda: st.video(youtube_link)
-    st.button('팀 영상 보기', on_click=play_videp)
+    st.button('팀 영상 보기', on_click=play_video)
