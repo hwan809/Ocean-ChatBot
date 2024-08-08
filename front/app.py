@@ -205,11 +205,10 @@ if prompt := st.chat_input("질문을 입력하세요"):
         )
         response = st.write_stream(stream)
 
-        if len(docs) == 1:
-            youtube_link = docs[0].metadata['Youtube link']
+        youtube_link = docs[0].metadata['Youtube link']
             
-            st.markdown(docs[0].metadata['Youtube link'])
-            st.video(docs[0].metadata['Youtube link'])
+        st.markdown(youtube_link)
+        st.video(youtube_link)
 
     st.session_state.messages.append({"role": "assistant", "content": response})
 
