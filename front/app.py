@@ -213,9 +213,9 @@ if prompt := st.chat_input("질문을 입력하세요"):
         )
         response = st.write_stream(stream)
     
-    play_youtube_link = lambda link: st.video(link)
     youtube_link = docs[0].metadata['Youtube link']
-    st.button('팀 영상 보기', on_click=play_youtube_link(youtube_link))
+    if st.button('팀 영상 보기'):
+        st.video(youtube_link)
 
     st.session_state.messages.append({"role": "assistant", "content": response})
 
