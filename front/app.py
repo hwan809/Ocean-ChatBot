@@ -177,10 +177,10 @@ ensemble_retriever = EnsembleRetriever(
 qa_chain = setup_rag_pipeline(ensemble_retriever)
 googlesheet = GooglesheetUtils()
 
-# from RealtimeTTS import TextToAudioStream, OpenAIEngine
+from RealtimeTTS import TextToAudioStream, GTTSEngine
 
-# engine = OpenAIEngine() # replace with your TTS engine
-# stream = TextToAudioStream(engine)
+engine = GTTSEngine()
+audio_stream = TextToAudioStream(engine)
 
 # Chat interface
 if "messages" not in st.session_state:
@@ -201,12 +201,14 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     with st.chat_message(name="assistant", avatar='🐋'):
         stream = qa_chain.stream(prompt)
-        response = st.write_stream(stream)
+        audio_stream.feed(stream)
+        audio_stream.play_async()
+        # response = st.write_stream(stream)
 
-    st.session_state.messages.append({"role": "assistant", "content": response})
+    st.session_state.messages.append({"role": "assistant", "content": 'new'})
 
     now = datetime.datetime.now()
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
-    values = [[prompt, response, timestamp]]
+    values = [[prompt, 'new', timestamp]]
     googlesheet.append_data(values, 'Sheet1!A1')
