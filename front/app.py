@@ -104,12 +104,6 @@ metadata_field_info = [
         name="Teammate #2 number",
         description="A team member's student number. The student number is four digits",
         type="string"
-    ),
-
-    AttributeInfo(
-        name="Youtube link",
-        description="A youtube video link by the team. You can watch the video by clicking on the link",
-        type="string"
     )
 ]
 
@@ -208,6 +202,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
     with st.chat_message(name="assistant", avatar='🐋'):
         stream = qa_chain.stream(prompt)
         response = st.write_stream(stream)
+        print(response)
 
     st.session_state.messages.append({"role": "assistant", "content": response})
 
