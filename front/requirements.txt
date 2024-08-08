@@ -7,3 +7,4 @@ lark
 pysqlite3-binary
 st-gsheets-connection
 google-api-python-client
+Pillow
