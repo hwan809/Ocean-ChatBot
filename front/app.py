@@ -169,7 +169,8 @@ new_query_constructor = query_prompt | llm | output_parser
 self_query_retriever = SelfQueryRetriever(
     query_constructor=new_query_constructor,
     vectorstore=vectorstore,
-    structured_query_translator=ChromaTranslator()
+    structured_query_translator=ChromaTranslator(),
+    search_kwargs={"k": 1}
 )
 
 from langchain.retrievers import EnsembleRetriever
@@ -249,7 +250,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     for doc in docs:
         st.markdown(team_code + ', ' + doc.metadata['Year'])
-        
+
     st.session_state.messages.append({"role": "assistant", "content": response})
 
     play_video = lambda: st.session_state.messages.append({"role": "video", "content": youtube_link})
