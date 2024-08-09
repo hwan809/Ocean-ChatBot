@@ -4,8 +4,6 @@ KEY = os.environ.get("OPENAI_API_KEY")
 
 from openai import OpenAI
 
-from pprint import pprint
-
 class YearDistribution:
     
     def __init__(self, model, KEY) -> None:
