@@ -228,7 +228,7 @@ for i in range(len(st.session_state.messages)):
     elif message["role"] == "image":
         with st.chat_message(name="assistant", avatar='🐋'):
             st.image(message["content"], width=360)    
-    else:
+    else :
         with st.chat_message(name="user"):
             st.markdown(message["content"])
         
@@ -239,9 +239,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(prompt)
 
     with st.chat_message(name="assistant", avatar='🐋'):
-        # docs = ensemble_retriever.invoke(prompt)
         now_retriever = get_jukdang_retriever(prompt)
-
         docs = now_retriever.invoke(prompt)
 
         stream = qa_chain.stream(
