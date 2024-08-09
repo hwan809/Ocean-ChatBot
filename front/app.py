@@ -192,7 +192,7 @@ youtube_link = ''
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-for i in len(st.session_state.messages):
+for i in range(len(st.session_state.messages)):
     message = st.session_state.messages[i]
     if message["role"] == "assistant":
         with st.chat_message(name="assistant", avatar='🐋'):
