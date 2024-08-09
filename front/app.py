@@ -246,7 +246,9 @@ if prompt := st.chat_input("질문을 입력하세요"):
     youtube_link = docs[0].metadata['Youtube link']
     team_code = docs[0].metadata['Team code']
 
-    os.write(1, team_code)
+    line = str.encode(team_code) 
+
+    os.write(1, line)
     st.session_state.messages.append({"role": "assistant", "content": response})
 
     play_video = lambda: st.session_state.messages.append({"role": "video", "content": youtube_link})
