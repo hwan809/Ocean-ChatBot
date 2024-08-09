@@ -1,10 +1,10 @@
-orjson==3.9.12
+orjson >= 3.9.12
 langchain
 langchain_core
 langchain_openai
 langchain_community
 langchain-chroma
-chromadb == 0.4.0 
+chromadb == 0.5.5 
 lark
 pysqlite3-binary
 st-gsheets-connection
