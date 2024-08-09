@@ -1,3 +1,4 @@
+orjson
 langchain
 langchain_core
 langchain_openai
@@ -7,3 +8,4 @@ lark
 pysqlite3-binary
 st-gsheets-connection
 google-api-python-client
+Pillow
