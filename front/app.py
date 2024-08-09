@@ -192,10 +192,26 @@ youtube_link = ''
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-for message in st.session_state.messages:
+for i in range(len(st.session_state.messages)):
+    message = st.session_state.messages[i]
     if message["role"] == "assistant":
         with st.chat_message(name="assistant", avatar='🐋'):
             st.markdown(message["content"])
+
+        # if i == len(st.session_state.messages): continue
+        
+        # next_message = st.session_state.messages[i + 1]
+
+        # if message["role"] == "video":
+        #     with st.chat_message(name="assistant", avatar='🐋'):
+        #         st.video(message["content"])
+        # elif message["role"] == "image":
+        #     with st.chat_message(name="assistant", avatar='🐋'):
+        #         st.image(message["content"], width=360)
+        #         st.markdown('해당 팀의 위치입니다. 즐거운 관람 되세요!')
+        
+        # i += 1
+        
     elif message["role"] == "video":
         with st.chat_message(name="assistant", avatar='🐋'):
             st.video(message["content"])    
@@ -204,7 +220,8 @@ for message in st.session_state.messages:
             st.image(message["content"], width=360)    
     else:
         with st.chat_message(name="user"):
-            st.markdown(message["content"])        
+            st.markdown(message["content"])
+        
 
 if prompt := st.chat_input("질문을 입력하세요"):
     st.session_state.messages.append({"role": "user", "content": prompt})

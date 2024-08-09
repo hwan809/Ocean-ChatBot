@@ -1,3 +1,4 @@
+orjson==3.9.12
 langchain
 langchain_core
 langchain_openai
