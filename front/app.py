@@ -3,8 +3,6 @@ from db import GooglesheetUtils
 from loc_image import get_location_image
 import datetime
 
-import os
-
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
@@ -45,8 +43,6 @@ def setup_rag_pipeline(_retriever):
     Ocean ICT에 대해서만 답변할 수 있다고 말하면 됩니다.
     
     절대로 유튜브 링크를 사용자에게 공유하지 말고, 아래 동영상을 참조해달라고 하세요.
-
-    올해는 2024년이다.
     
     답을 안다면 있는 정보를 사용해 최대한 자세하게 답변할 수 있도록 하되, 자신의 소개는 할 필요가 없습니다. 여러 줄에 걸쳐서 답변하세요.
     한국어로 친절하고, 친근하게 답하십시오.
@@ -70,7 +66,7 @@ st.title("한바다 🐬")
 st.header("2024 Ocean ICT 챗봇 도우미")
 
 vectorstore = Chroma(
-    persist_directory="db/chroma_all_pdfs",
+    persist_directory="db/chroma_2023_pdfs_new",
     embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key)
 )
 
@@ -169,8 +165,7 @@ new_query_constructor = query_prompt | llm | output_parser
 self_query_retriever = SelfQueryRetriever(
     query_constructor=new_query_constructor,
     vectorstore=vectorstore,
-    structured_query_translator=ChromaTranslator(),
-    search_kwargs={"k": 1}
+    structured_query_translator=ChromaTranslator()
 )
 
 from langchain.retrievers import EnsembleRetriever
@@ -234,8 +229,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(prompt)
 
     with st.chat_message(name="assistant", avatar='🐋'):
-        # docs = ensemble_retriever.invoke(prompt)
-        docs = self_query_retriever.invoke(prompt)
+        docs = ensemble_retriever.invoke(prompt)
 
         stream = qa_chain.stream(
             {
@@ -247,10 +241,6 @@ if prompt := st.chat_input("질문을 입력하세요"):
     
     youtube_link = docs[0].metadata['Youtube link']
     team_code = docs[0].metadata['Team code']
-
-    for doc in docs:
-        st.markdown(team_code + ', ' + doc.metadata['Year'])
-
     st.session_state.messages.append({"role": "assistant", "content": response})
 
     play_video = lambda: st.session_state.messages.append({"role": "video", "content": youtube_link})
