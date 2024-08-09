@@ -233,7 +233,8 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(prompt)
 
     with st.chat_message(name="assistant", avatar='🐋'):
-        docs = ensemble_retriever.invoke(prompt)
+        # docs = ensemble_retriever.invoke(prompt)
+        docs = self_query_retriever.invoke(prompt)
 
         stream = qa_chain.stream(
             {
@@ -245,7 +246,10 @@ if prompt := st.chat_input("질문을 입력하세요"):
     
     youtube_link = docs[0].metadata['Youtube link']
     team_code = docs[0].metadata['Team code']
-    st.markdown(team_code + ', ' + docs[0].metadata['Year'])
+
+    for doc in docs:
+        st.markdown(team_code + ', ' + doc.metadata['Year'])
+        
     st.session_state.messages.append({"role": "assistant", "content": response})
 
     play_video = lambda: st.session_state.messages.append({"role": "video", "content": youtube_link})
