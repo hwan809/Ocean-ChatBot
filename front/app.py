@@ -233,8 +233,6 @@ if prompt := st.chat_input("질문을 입력하세요"):
         )
         response = st.write_stream(stream)
 
-    print(docs)
-    
     youtube_link = docs[0].metadata['Youtube link']
     team_code = docs[0].metadata['Team code']
     st.session_state.messages.append({"role": "assistant", "content": response})
