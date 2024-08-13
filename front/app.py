@@ -198,19 +198,19 @@ for i in range(len(st.session_state.messages)):
         with st.chat_message(name="assistant", avatar='🐋'):
             st.markdown(message["content"])
 
-        # if i == len(st.session_state.messages): continue
+        if i == len(st.session_state.messages): continue
         
-        # next_message = st.session_state.messages[i + 1]
+        next_message = st.session_state.messages[i + 1]
 
-        # if message["role"] == "video":
-        #     with st.chat_message(name="assistant", avatar='🐋'):
-        #         st.video(message["content"])
-        # elif message["role"] == "image":
-        #     with st.chat_message(name="assistant", avatar='🐋'):
-        #         st.image(message["content"], width=360)
-        #         st.markdown('해당 팀의 위치입니다. 즐거운 관람 되세요!')
+        if message["role"] == "video":
+            with st.chat_message(name="assistant", avatar='🐋'):
+                st.video(message["content"])
+        elif message["role"] == "image":
+            with st.chat_message(name="assistant", avatar='🐋'):
+                st.image(message["content"], width=360)
+                st.markdown('해당 팀의 위치입니다. 즐거운 관람 되세요!')
         
-        # i += 1
+        i += 1
         
     elif message["role"] == "video":
         with st.chat_message(name="assistant", avatar='🐋'):
@@ -246,15 +246,15 @@ if prompt := st.chat_input("질문을 입력하세요"):
     play_video = lambda: st.session_state.messages.append({"role": "video", "content": youtube_link})
     show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(team_code)})
 
-    now = datetime.datetime.now()
-    timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
-
-    values = [[prompt, response, timestamp]]
-    googlesheet.append_data(values, 'Sheet1!A1')
-
     col1, col2, col3 = st.columns([1, 1, 3])
 
     with col1:
         st.button('팀 영상 보기', on_click=play_video)
     with col2:
         st.button('팀 위치 보기', on_click=show_loc_img)
+
+    now = datetime.datetime.now()
+    timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    values = [[prompt, response, timestamp]]
+    googlesheet.append_data(values, 'Sheet1!A1')
