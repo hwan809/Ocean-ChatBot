@@ -57,6 +57,11 @@ def setup_rag_pipeline(_retriever):
 
     return chain
 
+def find_document(docs, team_code):
+    for doc in docs:
+        if doc.metadata['Team code'] == team_code.trim():
+            return doc
+    return None
 
 # Streamlit UI
 st.title("한바다 🐬")
@@ -189,21 +194,6 @@ for i in range(len(st.session_state.messages)):
     if message["role"] == "assistant":
         with st.chat_message(name="assistant", avatar='🐋'):
             st.markdown(message["content"])
-
-        # if i == len(st.session_state.messages): continue
-        
-        # next_message = st.session_state.messages[i + 1]
-
-        # if message["role"] == "video":
-        #     with st.chat_message(name="assistant", avatar='🐋'):
-        #         st.video(message["content"])
-        # elif message["role"] == "image":
-        #     with st.chat_message(name="assistant", avatar='🐋'):
-        #         st.image(message["content"], width=360)
-        #         st.markdown('해당 팀의 위치입니다. 즐거운 관람 되세요!')
-        
-        # i += 1
-        
     elif message["role"] == "video":
         with st.chat_message(name="assistant", avatar='🐋'):
             st.video(message["content"])    
@@ -230,19 +220,21 @@ if prompt := st.chat_input("질문을 입력하세요"):
         )
         response = st.write_stream(stream)
 
-    youtube_link = docs[0].metadata['Youtube link']
-    team_code = docs[0].metadata['Team code']
+    used_team_code = response.split('|')[1:]
+    used_doc = find_document(used_team_code)
+    used_doc_vid = used_doc.metat
+
     st.session_state.messages.append({"role": "assistant", "content": response})
 
     play_video = lambda: st.session_state.messages.append({"role": "video", "content": youtube_link})
-    show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(team_code)})
+    show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code)})
     
-    # col1, col2, col3 = st.columns([1, 1, 3])
+    col1, col2, col3 = st.columns([1, 1, 3])
 
-    # with col1:
-    #     st.button('팀 영상 보기', on_click=play_video)
-    # with col2:
-    #     st.button('팀 위치 보기', on_click=show_loc_img)
+    with col1:
+        st.button('팀 영상 보기', on_click=play_video)
+    with col2:
+        st.button('팀 위치 보기', on_click=show_loc_img)
 
     now = datetime.datetime.now()
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
