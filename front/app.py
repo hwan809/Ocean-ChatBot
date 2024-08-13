@@ -135,16 +135,18 @@ if prompt := st.chat_input("질문을 입력하세요"):
     if len(used_team_code) == 1 and 'None' not in used_team_code:
         used_doc = find_document(docs, used_team_code[0])
         used_doc_vid = used_doc.metadata['Youtube link']
+        used_year = used_doc.metadata['Year']
 
         play_video = lambda: st.session_state.messages.append({"role": "video", "content": used_doc_vid})
         show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code)})
-        
+    
         col1, col2, col3 = st.columns([1, 1, 3])
 
         with col1:
             st.button('팀 영상 보기', on_click=play_video)
-        with col2:
-            st.button('팀 위치 보기', on_click=show_loc_img)
+        if used_year == '2024':
+            with col2:
+                st.button('팀 위치 보기', on_click=show_loc_img)
 
     st.session_state.messages.append({"role": "assistant", "content": response})        
     now = datetime.now() + timedelta(hours=9)
