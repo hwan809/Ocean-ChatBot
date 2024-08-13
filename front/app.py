@@ -60,9 +60,10 @@ def setup_rag_pipeline():
     chain = prompt | llm | StrOutputParser()
     return chain
 
-def find_document(docs, team_code):
+def find_document(docs, team_code, now_year):
     for doc in docs:
-        if doc.metadata['Team code'] == team_code:
+        if doc.metadata['Team code'] == team_code and \
+            doc.metadata['Year'] == now_year:
             return doc
     return None
 
@@ -133,9 +134,8 @@ if prompt := st.chat_input("질문을 입력하세요"):
     used_team_code = [i.strip() for i in response.split('|')[1:]]
 
     if len(used_team_code) == 1 and 'None' not in used_team_code:
-        used_doc = find_document(docs, used_team_code[0])
+        used_doc = find_document(docs, used_team_code[0], now_year)
         used_doc_vid = used_doc.metadata['Youtube link']
-        used_year = used_doc.metadata['Year']
 
         play_video = lambda: st.session_state.messages.append({"role": "video", "content": used_doc_vid})
         show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code)})
@@ -144,7 +144,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
         with col1:
             st.button('팀 영상 보기', on_click=play_video)
-        if used_year == '2024':
+        if now_year == '2024':
             with col2:
                 st.button('팀 위치 보기', on_click=show_loc_img)
 
