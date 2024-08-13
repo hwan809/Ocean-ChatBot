@@ -1,6 +1,8 @@
 import streamlit as st
+
 from db import GooglesheetUtils
 from loc_image import get_location_image
+from retriever import CustomRetriever
 from datetime import datetime, timedelta
 
 __import__('pysqlite3')
@@ -25,13 +27,10 @@ from langchain.chains.query_constructor.base import (
 )
 
 openai_api_key = st.secrets['OPENAI_API_KEY']
-
-# Set OpenAI API key
 llm = ChatOpenAI(model_name="gpt-4o", temperature=0, openai_api_key=openai_api_key)
 
-# Function to setup RAG pipeline
 @st.cache_resource
-def setup_rag_pipeline(_retriever):
+def setup_rag_pipeline():
     prompt = PromptTemplate.from_template(
     """당신은 부산과학고등학교의 행사 "Ocean ICT"의 도우미 챗봇인 "한바다" 입니다.
     검색된 정보를 사용하여 질문에 답합니다.
@@ -54,20 +53,15 @@ def setup_rag_pipeline(_retriever):
 
     #답변:"""
     )
-    
-    #예시) {'answer': 'B03 팀은..', 'source': 'B03'}
 
     chain = prompt | llm | StrOutputParser()
-
     return chain
-
 def find_document(docs, team_code):
     for doc in docs:
         if doc.metadata['Team code'] == team_code:
             return doc
     return None
 
-# Streamlit UI
 st.title("한바다 🐬")
 st.header("2024 Ocean ICT 챗봇 도우미")
 
@@ -75,116 +69,15 @@ vectorstore = Chroma(
     persist_directory="db/chroma_2024_pdfs",
     embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key)
 )
-
-metadata_field_info = [
-    AttributeInfo(
-        name="Team code",
-        description="Unique code that the team has. alphabetical uppercase + double digit combination.",
-        type="string",
-    ),
-    AttributeInfo(
-        name="Title",
-        description="the topic that the team studied/made",
-        type="string",
-    ),
-    AttributeInfo(
-        name="Teammate #1 name",
-        description="A team member's name. name is two or three letters of Hangul.",
-        type="string"
-    ),
-
-    AttributeInfo(
-        name="Teammate #1 number",
-        description="A team member's student number. The student number is four digits.",
-        type="string"
-    ),
-    AttributeInfo(
-        name="Teammate #2 name",
-        description="A team member's name. name is two or three letters of Hangul.",
-        type="string"
-    ),
-
-    AttributeInfo(
-        name="Teammate #2 number",
-        description="A team member's student number. The student number is four digits",
-        type="string"
-    ),
-
-    AttributeInfo(
-        name="Youtube link",
-        description="A youtube video link from the team. The vido can be played by clicking on the link.",
-        type="string"
-    )
-]
-
-examples = [
-    (
-        "A23 팀?",
-        {
-            "query": "작품 설명서",
-            "filter": 'eq("Team code", "A23")',
-        },
-    ),
-    (
-        "이동윤은 뭐했어?",
-        {
-            "query": "작품 설명서",
-            "filter": 'or(eq("Teammate #1 name", "이동윤"), eq("Teammate #2 name", "이동윤"))',
-        },
-    ),
-    (
-        "환경에 관한 주제로 연구한 팀을 알려줄래?",
-        {
-            "query": "환경에 관한 주제로 연구한 팀을 알려줄래?",
-            "filter": "NO_FILTER",
-        }   
-    ),
-    (
-        "팀 번호가 B로 시작하는 프로젝트의 주제는 어떤 것이 있어?",
-        {
-            "query": "팀 번호가 B로 시작하는 프로젝트의 주제는 어떤 것이 있어?",
-            "filter": "NO_FILTER",
-        }
-    ),
-    (
-        "머신러닝을 사용하지 않은 팀이 있을까?",
-        {
-            "query": "머신러닝을 사용하지 않은 팀이 있을까?",
-            "filter": "NO_FILTER",
-        }
-    )
-]
-
-# 문서 내용 설명과 메타데이터 필드 정보를 사용하여 쿼리 생성기 프롬프트를 가져옵니다.
-query_prompt = get_query_constructor_prompt(
-    'Ocean ICT 대회에 참가한 팀의 작품 설명서.',
-    metadata_field_info,
-    examples=examples
+vectorstore_old = Chroma(
+    persist_directory="db/chroma_all_pdfs",
+    embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key)
 )
 
-# 구성 요소에서 구조화된 쿼리 출력 파서를 생성합니다.
-output_parser = StructuredQueryOutputParser.from_components()
+retriever = CustomRetriever(vectorstore)
+retriever_old = CustomRetriever(vectorstore_old)
 
-# 프롬프트, 언어 모델, 출력 파서를 연결하여 쿼리 생성기를 만듭니다.
-new_query_constructor = query_prompt | llm | output_parser
-
-self_query_retriever = SelfQueryRetriever(
-    query_constructor=new_query_constructor,
-    vectorstore=vectorstore,
-    structured_query_translator=ChromaTranslator()
-)
-
-from langchain.retrievers import EnsembleRetriever
-
-# 앙상블 retriever를 초기화합니다.
-ensemble_retriever = EnsembleRetriever(
-    retrievers=[self_query_retriever, vectorstore.as_retriever()],
-    weights=[0.5, 0.5],
-    search_type="mmr",
-)
-
-# Setup RAG pipeline
-qa_chain = setup_rag_pipeline(ensemble_retriever)
+qa_chain = setup_rag_pipeline()
 googlesheet = GooglesheetUtils()
 
 used_doc_vid = ''
@@ -215,7 +108,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(prompt)
 
     with st.chat_message(name="assistant", avatar='🐋'):
-        docs = ensemble_retriever.invoke(prompt)
+        docs = retriever.invoke(prompt)
         stream = qa_chain.stream(
             {
                 "context": docs,
