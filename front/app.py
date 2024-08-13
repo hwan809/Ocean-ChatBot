@@ -51,7 +51,7 @@ def setup_rag_pipeline():
     #질문:
     {question}
     #정보:
-    2023년의 Ocean ICT에는 총 86팀이 참가하였다. 다음은 참가한 팀들의 포스터 중 질문과 관계된 일부이다.
+    2024년에 열린 제 7회 Ocean ICT에는 총 96팀이 참가하였다. 다음은 참가한 팀들의 포스터 중 질문과 관계된 일부이다.
     {context}
 
     #답변:"""
@@ -113,8 +113,9 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     now_retriever = None
     find_year = YearDistribution("gpt-4o-mini")
+    now_year = find_year.Year(prompt).strip()
 
-    if find_year.Year(prompt).strip() is not '2024':
+    if now_year is not '2024':
         now_retriever = retriever_old.get_ensemble_retriever()
     else:
         now_retriever = retriever.get_ensemble_retriever()
