@@ -230,6 +230,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     with st.chat_message(name="assistant", avatar='🐋'):
         docs = ensemble_retriever.invoke(prompt)
+        print(docs)
 
         stream = qa_chain.stream(
             {
