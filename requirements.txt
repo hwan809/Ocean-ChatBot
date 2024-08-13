@@ -1,6 +1,0 @@
-pandas
-numpy
-PyMuPDF
-unstructured
-python-magic
-python-pptx

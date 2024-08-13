@@ -1,8 +1,11 @@
 import streamlit as st
 
 from db import GooglesheetUtils
+
 from loc_image import get_location_image
 from retriever import CustomRetriever
+from yeardistribution import YearDistribution
+
 from datetime import datetime, timedelta
 
 __import__('pysqlite3')
@@ -57,6 +60,7 @@ def setup_rag_pipeline():
 
     chain = prompt | llm | StrOutputParser()
     return chain
+
 def find_document(docs, team_code):
     for doc in docs:
         if doc.metadata['Team code'] == team_code:
@@ -71,7 +75,7 @@ vectorstore = Chroma(
     embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key)
 )
 vectorstore_old = Chroma(
-    persist_directory="db/chroma_all_pdfs",
+    persist_directory="db/chroma_19to23_pdfs",
     embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key)
 )
 
@@ -108,15 +112,19 @@ if prompt := st.chat_input("질문을 입력하세요"):
     with st.chat_message("user"):
         st.markdown(prompt)
 
+    now_retriever = None
+    find_year = YearDistribution("gpt-4o-mini")
+    now_retriever = retriever.get_ensemble_retriever()
+
+    docs = now_retriever.invoke(prompt)
+    stream = qa_chain.stream(
+        {
+            "context": docs,
+            "question": prompt
+        }
+    )
+
     with st.chat_message(name="assistant", avatar='🐋'):
-        now_retriever = retriever.get_ensemble_retriever()
-        docs = now_retriever.invoke(prompt)
-        stream = qa_chain.stream(
-            {
-                "context": docs,
-                "question": prompt
-            }
-        )
         response = st.write_stream(stream)
 
     used_team_code = [i.strip() for i in response.split('|')[1:]]
