@@ -5,10 +5,9 @@ KEY = os.environ.get("OPENAI_API_KEY")
 from openai import OpenAI
 
 class YearDistribution:
-    
-    def __init__(self, model) -> None:
+    def __init__(self, model, KEY) -> None:
         self.model = model
-        self.client = OpenAI(api_key=KEY)
+        self.client = OpenAI(api_key = KEY)
 
     def Year(self, question) -> None:
         completion = self.client.chat.completions.create(
