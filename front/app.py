@@ -183,11 +183,6 @@ googlesheet = GooglesheetUtils()
 
 youtube_link = ''
 
-# from RealtimeTTS import TextToAudioStream, GTTSEngine
-
-# engine = GTTSEngine()
-# audio_stream = TextToAudioStream(engine)
-
 # Chat interface
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -230,8 +225,6 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     with st.chat_message(name="assistant", avatar='🐋'):
         docs = ensemble_retriever.invoke(prompt)
-        print(docs)
-
         stream = qa_chain.stream(
             {
                 "context": docs,
@@ -239,6 +232,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
             }
         )
         response = st.write_stream(stream)
+        print(docs)
     
     youtube_link = docs[0].metadata['Youtube link']
     team_code = docs[0].metadata['Team code']
