@@ -222,7 +222,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     used_team_code = [i.strip() for i in response.split('|')[1:]]
 
-    if used_team_code:
+    if used_team_code and 'None' not in used_team_code:
         used_doc = find_document(docs, used_team_code[0])
         used_doc_vid = used_doc.metadata['Youtube link']
 
