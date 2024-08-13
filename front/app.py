@@ -130,14 +130,14 @@ if prompt := st.chat_input("질문을 입력하세요"):
     with st.chat_message(name="assistant", avatar='🐋'):
         response = st.write_stream(stream)
 
-    used_team_code = [i.strip() for i in response.split('|')[1:]][0]
+    used_team_code = [i.strip() for i in response.split('|')[1:]]
 
     if len(used_team_code) == 1 and 'None' not in used_team_code:
-        used_doc = find_document(docs, used_team_code, now_year)
+        used_doc = find_document(docs, used_team_code[0], now_year)
         used_doc_vid = used_doc.metadata['Youtube link']
 
         play_video = lambda: st.session_state.messages.append({"role": "video", "content": used_doc_vid})
-        show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code)})
+        show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code[0])})
     
         col1, col2, col3 = st.columns([1, 1, 3])
 
