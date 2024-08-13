@@ -1,10 +1,13 @@
 import streamlit as st
 from db import GooglesheetUtils
+from loc_image import get_location_image
 import datetime
 
-# __import__('pysqlite3')
-# import sys
-# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+import os
+
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 import sqlite3
 
@@ -23,7 +26,6 @@ from langchain.chains.query_constructor.base import (
     get_query_constructor_prompt,
 )
 
-from langchain.chains import RetrievalQA
 openai_api_key = st.secrets['OPENAI_API_KEY']
 
 # Set OpenAI API key
@@ -42,6 +44,10 @@ def setup_rag_pipeline(_retriever):
     답을 모른다면 그냥 당신의 정보에 대해 언급하고,
     Ocean ICT에 대해서만 답변할 수 있다고 말하면 됩니다.
     
+    절대로 유튜브 링크를 사용자에게 공유하지 말고, 아래 동영상을 참조해달라고 하세요.
+
+    올해는 2024년이다.
+    
     답을 안다면 있는 정보를 사용해 최대한 자세하게 답변할 수 있도록 하되, 자신의 소개는 할 필요가 없습니다. 여러 줄에 걸쳐서 답변하세요.
     한국어로 친절하고, 친근하게 답하십시오.
 
@@ -54,12 +60,7 @@ def setup_rag_pipeline(_retriever):
     #답변:"""
     )
 
-    chain = (
-    {"context": ensemble_retriever, "question": RunnablePassthrough()}
-    | prompt
-    | llm
-    | StrOutputParser()
-    )
+    chain = prompt | llm | StrOutputParser()
 
     return chain
 
@@ -69,7 +70,7 @@ st.title("한바다 🐬")
 st.header("2024 Ocean ICT 챗봇 도우미")
 
 vectorstore = Chroma(
-    persist_directory="db/chroma_2023_pdfs",
+    persist_directory="db/chroma_all_pdfs",
     embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key)
 )
 
@@ -104,6 +105,12 @@ metadata_field_info = [
     AttributeInfo(
         name="Teammate #2 number",
         description="A team member's student number. The student number is four digits",
+        type="string"
+    ),
+
+    AttributeInfo(
+        name="Youtube link",
+        description="A youtube video link from the team. The vido can be played by clicking on the link.",
         type="string"
     )
 ]
@@ -162,7 +169,8 @@ new_query_constructor = query_prompt | llm | output_parser
 self_query_retriever = SelfQueryRetriever(
     query_constructor=new_query_constructor,
     vectorstore=vectorstore,
-    structured_query_translator=ChromaTranslator()
+    structured_query_translator=ChromaTranslator(),
+    search_kwargs={"k": 1}
 )
 
 from langchain.retrievers import EnsembleRetriever
@@ -176,20 +184,49 @@ ensemble_retriever = EnsembleRetriever(
 
 # Setup RAG pipeline
 qa_chain = setup_rag_pipeline(ensemble_retriever)
-
 googlesheet = GooglesheetUtils()
+
+youtube_link = ''
+
+# from RealtimeTTS import TextToAudioStream, GTTSEngine
+
+# engine = GTTSEngine()
+# audio_stream = TextToAudioStream(engine)
 
 # Chat interface
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-for message in st.session_state.messages:
+for i in range(len(st.session_state.messages)):
+    message = st.session_state.messages[i]
     if message["role"] == "assistant":
         with st.chat_message(name="assistant", avatar='🐋'):
             st.markdown(message["content"])
+
+        # if i == len(st.session_state.messages): continue
+        
+        # next_message = st.session_state.messages[i + 1]
+
+        # if message["role"] == "video":
+        #     with st.chat_message(name="assistant", avatar='🐋'):
+        #         st.video(message["content"])
+        # elif message["role"] == "image":
+        #     with st.chat_message(name="assistant", avatar='🐋'):
+        #         st.image(message["content"], width=360)
+        #         st.markdown('해당 팀의 위치입니다. 즐거운 관람 되세요!')
+        
+        # i += 1
+        
+    elif message["role"] == "video":
+        with st.chat_message(name="assistant", avatar='🐋'):
+            st.video(message["content"])    
+    elif message["role"] == "image":
+        with st.chat_message(name="assistant", avatar='🐋'):
+            st.image(message["content"], width=360)    
     else:
         with st.chat_message(name="user"):
-            st.markdown(message["content"])        
+            st.markdown(message["content"])
+        
 
 if prompt := st.chat_input("질문을 입력하세요"):
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -197,13 +234,37 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(prompt)
 
     with st.chat_message(name="assistant", avatar='🐋'):
-        stream = qa_chain.stream(prompt)
+        # docs = ensemble_retriever.invoke(prompt)
+        docs = self_query_retriever.invoke(prompt)
+
+        stream = qa_chain.stream(
+            {
+                "context": docs,
+                "question": prompt
+            }
+        )
         response = st.write_stream(stream)
+    
+    youtube_link = docs[0].metadata['Youtube link']
+    team_code = docs[0].metadata['Team code']
+
+    for doc in docs:
+        st.markdown(team_code + ', ' + doc.metadata['Year'])
 
     st.session_state.messages.append({"role": "assistant", "content": response})
+
+    play_video = lambda: st.session_state.messages.append({"role": "video", "content": youtube_link})
+    show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(team_code)})
 
     now = datetime.datetime.now()
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
-    values = [[prompt, response['result'], timestamp]]
+    values = [[prompt, response, timestamp]]
     googlesheet.append_data(values, 'Sheet1!A1')
+
+    col1, col2, col3 = st.columns([1, 1, 3])
+
+    with col1:
+        st.button('팀 영상 보기', on_click=play_video)
+    with col2:
+        st.button('팀 위치 보기', on_click=show_loc_img)
