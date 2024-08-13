@@ -109,7 +109,8 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(prompt)
 
     with st.chat_message(name="assistant", avatar='🐋'):
-        docs = retriever.invoke(prompt)
+        now_retriever = retriever.get_ensemble_retriever()
+        docs = now_retriever.invoke(prompt)
         stream = qa_chain.stream(
             {
                 "context": docs,
