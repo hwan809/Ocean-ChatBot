@@ -35,16 +35,11 @@ def setup_rag_pipeline(_retriever):
     prompt = PromptTemplate.from_template(
     """당신은 부산과학고등학교의 행사 "Ocean ICT"의 도우미 챗봇인 "한바다" 입니다.
     검색된 정보를 사용하여 질문에 답합니다.
-    
     팀에 대한 정보를 언급할 때 반드시 팀 코드를 같이 언급하세요.
-    팀 코드는 대문자와 숫자 두 자리의 조합입니다.
-
-    답을 모른다면 그냥 당신의 정보에 대해 언급하고,
-    Ocean ICT에 대해서만 답변할 수 있다고 말하면 됩니다.
-    
+    답을 모른다면 그냥 당신의 정보에 대해 언급하고, Ocean ICT에 대해서만 답변할 수 있다고 말하면 됩니다.
     절대로 유튜브 링크를 사용자에게 공유하지 말고, 아래 동영상을 참조해달라고 하세요.
     
-    답을 안다면 있는 정보를 사용해 최대한 자세하게 답변할 수 있도록 하되, 자신의 소개는 할 필요가 없습니다. 여러 줄에 걸쳐서 답변하세요.
+    답을 안다면 있는 정보를 사용해 최대한 자세하게 답변하세요.
     한국어로 친절하고, 친근하게 답하십시오.
 
     #질문:
@@ -240,12 +235,12 @@ if prompt := st.chat_input("질문을 입력하세요"):
     play_video = lambda: st.session_state.messages.append({"role": "video", "content": youtube_link})
     show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(team_code)})
 
-    col1, col2, col3 = st.columns([1, 1, 3])
+    # col1, col2, col3 = st.columns([1, 1, 3])
 
-    with col1:
-        st.button('팀 영상 보기', on_click=play_video)
-    with col2:
-        st.button('팀 위치 보기', on_click=show_loc_img)
+    # with col1:
+    #     st.button('팀 영상 보기', on_click=play_video)
+    # with col2:
+    #     st.button('팀 위치 보기', on_click=show_loc_img)
 
     now = datetime.datetime.now()
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
