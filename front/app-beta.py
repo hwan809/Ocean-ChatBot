@@ -236,6 +236,8 @@ if prompt := st.chat_input("질문을 입력하세요"):
         with col2:
             st.button('팀 위치 보기', on_click=show_loc_img)
 
+    print(used_doc)
+    
     st.session_state.messages.append({"role": "assistant", "content": response})        
     now = datetime.now() + timedelta(hours=9)
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
