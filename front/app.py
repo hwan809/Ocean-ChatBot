@@ -222,7 +222,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     used_team_code = response.split('|')[1:]
     used_doc = find_document(used_team_code)
-    used_doc_vid = used_doc.metat
+    used_doc_vid = used_doc.metadata['Youtube link']
 
     st.session_state.messages.append({"role": "assistant", "content": response})
 
