@@ -221,7 +221,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
         response = st.write_stream(stream)
 
     used_team_code = response.split('|')[1:]
-    used_doc = find_document(used_team_code[0])
+    used_doc = find_document(docs, used_team_code[0])
     used_doc_vid = used_doc.metadata['Youtube link']
 
     st.session_state.messages.append({"role": "assistant", "content": response})
