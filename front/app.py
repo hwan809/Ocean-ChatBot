@@ -67,7 +67,7 @@ def find_document(docs, team_code, now_year):
     return None
 
 st.title("한바다 🐬")
-st.header("2024 Ocean ICT 챗봇 도우미")
+st.header("~~2024 Ocean ICT 챗봇 도우미~~ API 돈이 없어 일시적 사망")
 
 vectorstore = Chroma(
     persist_directory="db/chroma_2024_pdfs",
