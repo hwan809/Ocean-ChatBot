@@ -1,7 +1,7 @@
 import streamlit as st
 from db import GooglesheetUtils
 from loc_image import get_location_image
-import datetime
+from datetime import datetime, timedelta
 
 __import__('pysqlite3')
 import sys
@@ -39,12 +39,15 @@ def setup_rag_pipeline(_retriever):
     답을 모른다면 그냥 당신의 정보에 대해 언급하고, Ocean ICT에 대해서만 답변할 수 있다고 말하면 됩니다.
     절대로 유튜브 링크를 사용자에게 공유하지 말고, 아래 동영상을 참조해달라고 하세요.
     
-    답을 안다면 검색된 정보를 이용해 답변하세요.
+    답을 안다면 1. 있는 정보를 사용한 답과, 2. 답을 도출하는 데 직접적으로 사용되는 문서의 팀 코드 목록을 문자 '|'로 구분해 안내합니다. 없으면 None으로 표시합니다.
+    예시 답변: B03 팀은... | B03
+    하나 이상의 출처가 있는 경우 맨 뒤에 한꺼번에 표시하세요.
+    예시 답변: B03 팀과 A11 팀이 있습니다. | B03 | A11
 
     #질문:
     {question}
     #정보:
-    2024년의 Ocean ICT에는 총 96팀이 참가하였다. 다음은 참가한 팀들의 포스터 중 질문과 관계된 일부이다.
+    2023년의 Ocean ICT에는 총 86팀이 참가하였다. 다음은 참가한 팀들의 포스터 중 질문과 관계된 일부이다.
     {context}
 
     #답변:"""
@@ -58,7 +61,7 @@ def setup_rag_pipeline(_retriever):
 
 def find_document(docs, team_code):
     for doc in docs:
-        if doc.metadata['Team code'] == team_code.strip():
+        if doc.metadata['Team code'] == team_code:
             return doc
     return None
 
@@ -182,7 +185,7 @@ ensemble_retriever = EnsembleRetriever(
 qa_chain = setup_rag_pipeline(ensemble_retriever)
 googlesheet = GooglesheetUtils()
 
-youtube_link = ''
+used_doc_vid = ''
 
 # Chat interface
 if "messages" not in st.session_state:
@@ -219,9 +222,24 @@ if prompt := st.chat_input("질문을 입력하세요"):
         )
         response = st.write_stream(stream)
 
-    st.session_state.messages.append({"role": "assistant", "content": response})
+    used_team_code = [i.strip() for i in response.split('|')[1:]]
 
-    now = datetime.datetime.now()
+    if used_team_code:
+        used_doc = find_document(docs, used_team_code[0])
+        used_doc_vid = used_doc.metadata['Youtube link']
+
+        play_video = lambda: st.session_state.messages.append({"role": "video", "content": used_doc_vid})
+        show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code)})
+        
+        col1, col2, col3 = st.columns([1, 1, 3])
+
+        with col1:
+            st.button('팀 영상 보기', on_click=play_video)
+        with col2:
+            st.button('팀 위치 보기', on_click=show_loc_img)
+
+    st.session_state.messages.append({"role": "assistant", "content": response})        
+    now = datetime.now() + timedelta(hours=9)
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
     values = [[prompt, response, timestamp]]
