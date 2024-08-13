@@ -1,4 +1,4 @@
-from yeardistribution import YearDistribution
+from front.yeardistribution import YearDistribution
 import os
 
 KEY = os.environ.get("OPENAI_API_KEY")

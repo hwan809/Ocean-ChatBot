@@ -21,7 +21,7 @@ from langchain_chroma import Chroma
 from langchain.chains.query_constructor.base import AttributeInfo
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 
-from yeardistribution import YearDistribution
+from front.yeardistribution import YearDistribution
 
 from langchain.chains.query_constructor.base import (
     StructuredQueryOutputParser,
