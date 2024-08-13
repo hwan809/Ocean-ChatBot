@@ -39,7 +39,9 @@ def setup_rag_pipeline(_retriever):
     답을 모른다면 그냥 당신의 정보에 대해 언급하고, Ocean ICT에 대해서만 답변할 수 있다고 말하면 됩니다.
     절대로 유튜브 링크를 사용자에게 공유하지 말고, 아래 동영상을 참조해달라고 하세요.
     
-    답을 안다면 있는 정보를 사용해 최대한 자세하게 답변하세요.
+    답을 안다면 1. 있는 정보를 사용한 답과, 2. 답을 도출하는 데 직접적으로 사용되는 문서의 팀 코드 목록을 가져와 json 형식으로 답변한다.
+    예시) {'answer': 'B03 팀은..', 'source': 'B03'}
+    
     한국어로 친절하고, 친근하게 답하십시오.
 
     #질문:
@@ -234,7 +236,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     play_video = lambda: st.session_state.messages.append({"role": "video", "content": youtube_link})
     show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(team_code)})
-
+    
     # col1, col2, col3 = st.columns([1, 1, 3])
 
     # with col1:
