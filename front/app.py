@@ -1,6 +1,7 @@
 import streamlit as st
 
 from db import GooglesheetUtils
+import traceback
 
 from loc_image import get_location_image
 from retriever import CustomRetriever
@@ -112,40 +113,51 @@ if prompt := st.chat_input("질문을 입력하세요"):
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    now_retriever = None
-    find_year = YearDistribution("gpt-4o-mini")
-    now_retriever = retriever.get_ensemble_retriever()
-
-    docs = now_retriever.invoke(prompt)
-    stream = qa_chain.stream(
-        {
-            "context": docs,
-            "question": prompt
-        }
-    )
-
-    with st.chat_message(name="assistant", avatar='🐋'):
-        response = st.write_stream(stream)
-
-    used_team_code = [i.strip() for i in response.split('|')[1:]]
-
-    if len(used_team_code) == 1 and 'None' not in used_team_code:
-        used_doc = find_document(docs, used_team_code[0])
-        used_doc_vid = used_doc.metadata['Youtube link']
-
-        play_video = lambda: st.session_state.messages.append({"role": "video", "content": used_doc_vid})
-        show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code)})
-        
-        col1, col2, col3 = st.columns([1, 1, 3])
-
-        with col1:
-            st.button('팀 영상 보기', on_click=play_video)
-        with col2:
-            st.button('팀 위치 보기', on_click=show_loc_img)
-
-    st.session_state.messages.append({"role": "assistant", "content": response})        
     now = datetime.now() + timedelta(hours=9)
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
-    values = [[prompt, response, timestamp]]
-    googlesheet.append_data(values, 'Sheet1!A1')
+    try:
+        now_retriever = None
+        find_year = YearDistribution("gpt-4o-mini")
+        now_retriever = retriever.get_ensemble_retriever()
+
+        docs = now_retriever.invoke(prompt)
+        stream = qa_chain.stream(
+            {
+                "context": docs,
+                "question": prompt
+            }
+        )
+
+        with st.chat_message(name="assistant", avatar='🐋'):
+            response = st.write_stream(stream)
+
+        used_team_code = [i.strip() for i in response.split('|')[1:]]
+
+        if len(used_team_code) == 1 and 'None' not in used_team_code:
+            used_doc = find_document(docs, used_team_code[0])
+            used_doc_vid = used_doc.metadata['Youtube link']
+
+            play_video = lambda: st.session_state.messages.append({"role": "video", "content": used_doc_vid})
+            show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code)})
+            
+            col1, col2, col3 = st.columns([1, 1, 3])
+
+            with col1:
+                st.button('팀 영상 보기', on_click=play_video)
+            with col2:
+                st.button('팀 위치 보기', on_click=show_loc_img)
+
+        st.session_state.messages.append({"role": "assistant", "content": response})        
+
+
+        values = [[prompt, response, timestamp]]
+        googlesheet.append_data(values, 'Sheet1!A1')
+    except Exception as e:
+        error_message = str(e)
+        error_traceback = traceback.format_exc()
+
+        error = error_message + '\n' + error_traceback
+        values = [[prompt, error]]
+
+        googlesheet.append_data(values, 'Sheet1!A1')
