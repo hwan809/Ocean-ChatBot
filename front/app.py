@@ -59,7 +59,7 @@ def setup_rag_pipeline(_retriever):
 
 def find_document(docs, team_code):
     for doc in docs:
-        if doc.metadata['Team code'] == team_code.trim():
+        if doc.metadata['Team code'] == team_code.strip():
             return doc
     return None
 
