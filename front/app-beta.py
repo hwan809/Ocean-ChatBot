@@ -39,12 +39,13 @@ def setup_rag_pipeline(_retriever):
     답을 모른다면 그냥 당신의 정보에 대해 언급하고, Ocean ICT에 대해서만 답변할 수 있다고 말하면 됩니다.
     절대로 유튜브 링크를 사용자에게 공유하지 말고, 아래 동영상을 참조해달라고 하세요.
     
-    답을 안다면 검색된 정보를 이용해 답변하세요.
+    답을 안다면 1. 있는 정보를 사용한 답과, 2. 답을 도출하는 데 직접적으로 사용되는 문서의 팀 코드 목록을 문자 '|'로 구분해 안내합니다. 없으면 None으로 표시합니다.
+    예시: 답변: B03 팀은... | B03
 
     #질문:
     {question}
     #정보:
-    2024년의 Ocean ICT에는 총 96팀이 참가하였다. 다음은 참가한 팀들의 포스터 중 질문과 관계된 일부이다.
+    2023년의 Ocean ICT에는 총 86팀이 참가하였다. 다음은 참가한 팀들의 포스터 중 질문과 관계된 일부이다.
     {context}
 
     #답변:"""
@@ -219,7 +220,23 @@ if prompt := st.chat_input("질문을 입력하세요"):
         )
         response = st.write_stream(stream)
 
+    used_team_code = response.split('|')[1:]
+    used_doc = find_document(docs, used_team_code[0])
+    used_doc_vid = used_doc.metadata['Youtube link']
+
+    print(used_team_code)
+
     st.session_state.messages.append({"role": "assistant", "content": response})
+
+    play_video = lambda: st.session_state.messages.append({"role": "video", "content": youtube_link})
+    show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code)})
+    
+    col1, col2, col3 = st.columns([1, 1, 3])
+
+    with col1:
+        st.button('팀 영상 보기', on_click=play_video)
+    with col2:
+        st.button('팀 위치 보기', on_click=show_loc_img)
 
     now = datetime.datetime.now()
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
