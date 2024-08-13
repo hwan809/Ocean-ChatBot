@@ -113,10 +113,12 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     now_retriever = None
     find_year = YearDistribution("gpt-4o-mini")
-    now_year = find_year.Year(prompt).strip()
+    now_year = find_year.Year(prompt).replace('\n', '').strip()
 
-    now_retriever = retriever.get_ensemble_retriever()
-        
+    if now_year != '2024':
+        now_retriever = retriever_old.get_ensemble_retriever()
+    else:
+        now_retriever = retriever.get_ensemble_retriever()
     docs = now_retriever.invoke(prompt)
     stream = qa_chain.stream(
         {
