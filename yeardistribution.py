@@ -5,7 +5,6 @@ KEY = os.environ.get("OPENAI_API_KEY")
 from openai import OpenAI
 
 class YearDistribution:
-    
     def __init__(self, model, KEY) -> None:
         self.model = model
         self.client = OpenAI(api_key = KEY)
