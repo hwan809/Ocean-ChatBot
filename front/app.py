@@ -232,7 +232,8 @@ if prompt := st.chat_input("질문을 입력하세요"):
             }
         )
         response = st.write_stream(stream)
-        print(docs)
+
+    print(docs)
     
     youtube_link = docs[0].metadata['Youtube link']
     team_code = docs[0].metadata['Team code']
