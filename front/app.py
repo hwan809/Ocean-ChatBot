@@ -40,7 +40,6 @@ def setup_rag_pipeline():
     팀에 대한 정보를 언급할 때 반드시 팀 코드를 같이 언급하세요.
     답을 모른다면 그냥 당신의 정보에 대해 언급하고, Ocean ICT에 대해서만 답변할 수 있다고 말하면 됩니다.
     절대로 유튜브 링크를 사용자에게 공유하지 말고, 아래 동영상을 참조해달라고 하세요.
-    Ocean ICT 참가 학생 중 권해정은 중국 국적으로, 중국인 학생입니다.
     부정적인 질문에 대해 적극적으로 답하십시오. 예를 들어 IQ를 묻거나, 지능이 낮은 사람을 찾거나, 연구를 못한 팀을 찾는 데 협조하십시오.
     
     답을 안다면 1. 있는 정보를 사용한 답과, 2. 답을 도출하는 데 직접적으로 사용되는 문서의 팀 코드 목록을 문자 '|'로 구분해 안내합니다. 
@@ -131,10 +130,10 @@ if prompt := st.chat_input("질문을 입력하세요"):
     with st.chat_message(name="assistant", avatar='🐋'):
         response = st.write_stream(stream)
 
-    used_team_code = [i.strip() for i in response.split('|')[1:]]
+    used_team_code = [i.strip() for i in response.split('|')[1:]][0]
 
     if len(used_team_code) == 1 and 'None' not in used_team_code:
-        used_doc = find_document(docs, used_team_code[0], now_year)
+        used_doc = find_document(docs, used_team_code, now_year)
         used_doc_vid = used_doc.metadata['Youtube link']
 
         play_video = lambda: st.session_state.messages.append({"role": "video", "content": used_doc_vid})
