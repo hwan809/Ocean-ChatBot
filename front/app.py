@@ -30,7 +30,7 @@ from langchain.chains.query_constructor.base import (
 )
 
 openai_api_key = st.secrets['OPENAI_API_KEY']
-llm = ChatOpenAI(model_name="gpt-4o", temperature=0, openai_api_key=openai_api_key)
+llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key=openai_api_key)
 
 @st.cache_resource
 def setup_rag_pipeline():
@@ -67,7 +67,7 @@ def find_document(docs, team_code, now_year):
     return None
 
 st.title("한바다 🐬")
-st.header("2024 Ocean ICT 챗봇 도우미\n~~일시적 사망 (사유: API 돈을 다 씀)~~ 8/14 18:14 기준 결제 완료")
+st.header("2024 Ocean ICT 챗봇 도우미")
 
 vectorstore = Chroma(
     persist_directory="db/chroma_2024_pdfs",
@@ -112,7 +112,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(prompt)
 
     now_retriever = None
-    find_year = YearDistribution("gpt-4o")
+    find_year = YearDistribution("gpt-4o-mini")
     now_year = find_year.Year(prompt).replace('\n', '').strip()
 
     if now_year != '2024':
@@ -120,7 +120,6 @@ if prompt := st.chat_input("질문을 입력하세요"):
     else:
         now_retriever = retriever.get_ensemble_retriever()
     docs = now_retriever.invoke(prompt)
-
     stream = qa_chain.stream(
         {
             "context": docs,
