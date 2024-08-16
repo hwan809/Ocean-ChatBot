@@ -112,7 +112,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(prompt)
 
     now_retriever = None
-    find_year = YearDistribution("gpt-4o-mini")
+    find_year = YearDistribution("gpt-4o")
     now_year = find_year.Year(prompt).replace('\n', '').strip()
 
     if now_year != '2024':
@@ -120,6 +120,9 @@ if prompt := st.chat_input("질문을 입력하세요"):
     else:
         now_retriever = retriever.get_ensemble_retriever()
     docs = now_retriever.invoke(prompt)
+    
+    print(docs)
+
     stream = qa_chain.stream(
         {
             "context": docs,
