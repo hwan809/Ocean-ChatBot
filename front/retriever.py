@@ -3,11 +3,11 @@ from db import GooglesheetUtils
 from loc_image import get_location_image
 from datetime import datetime, timedelta
 
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+# __import__('pysqlite3')
+# import sys
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
-import sqlite3
+# import sqlite3
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser

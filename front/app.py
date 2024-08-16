@@ -8,11 +8,11 @@ from yeardistribution import YearDistribution
 
 from datetime import datetime, timedelta
 
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+# __import__('pysqlite3')
+# import sys
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
-import sqlite3
+# import sqlite3
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -30,7 +30,7 @@ from langchain.chains.query_constructor.base import (
 )
 
 openai_api_key = st.secrets['OPENAI_API_KEY']
-llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key=openai_api_key)
+llm = ChatOpenAI(model_name="gpt-4o", temperature=0, openai_api_key=openai_api_key)
 
 @st.cache_resource
 def setup_rag_pipeline():
