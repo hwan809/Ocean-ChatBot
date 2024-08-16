@@ -120,8 +120,6 @@ if prompt := st.chat_input("질문을 입력하세요"):
     else:
         now_retriever = retriever.get_ensemble_retriever()
     docs = now_retriever.invoke(prompt)
-    
-    print(docs)
 
     stream = qa_chain.stream(
         {
