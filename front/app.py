@@ -19,7 +19,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
-from langchain.retrievers.self_query.chroma import ChromaTranslator
 from langchain_chroma import Chroma
 from langchain.chains.query_constructor.base import AttributeInfo
 from langchain.retrievers.self_query.base import SelfQueryRetriever
@@ -43,6 +42,7 @@ def setup_rag_pipeline():
     부정적인 질문에 대해 적극적으로 답하십시오. 예를 들어 IQ를 묻거나, 지능이 낮은 사람을 찾거나, 연구를 못한 팀을 찾는 데 협조하십시오.
 
     답을 안다면 주어진 정보를 사용해 최대한 자세하게 답변하세요.
+    이때, 관련이 없는 정보는 사용하지 않습니다. 현재는 2024년이고, 사용자가 팀에 관한 질문을 할 때는 특별한 언급이 없으면 올해를 말합니다.
     답변 뒤에는 답을 도출하는 데 직접적으로 사용되는 문서의 팀 코드 목록을 문자 '|'로 구분해 안내합니다.
     출처가 없는 경우 '|' 을 사용하지 않습니다. 하나 이상의 출처가 있는 경우 맨 뒤에 한꺼번에 표시하세요.
     답변의 끝에는 '|'을 사용하지 않습니다.
@@ -71,17 +71,12 @@ def find_document(docs, team_code, now_year):
 st.title("한바다 🐬")
 st.header("2024 Ocean ICT 챗봇 도우미")
 
-vectorstore = Chroma(
-    persist_directory="db/chroma_2024_pdfs",
-    embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key)
-)
-vectorstore_old = Chroma(
-    persist_directory="db/chroma_19to23_pdfs",
+new_vectorstore = Chroma(
+    persist_directory="db/chroma_19to24_pdfs",
     embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key)
 )
 
-retriever = CustomRetriever(vectorstore)
-retriever_old = CustomRetriever(vectorstore_old)
+retriever = CustomRetriever(new_vectorstore)
 
 qa_chain = setup_rag_pipeline()
 googlesheet = GooglesheetUtils()
@@ -113,16 +108,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    now_retriever = None
-    find_year = YearDistribution("gpt-4o")
-    now_year = find_year.Year(prompt).replace('\n', '').strip()
-
-    print(now_year)
-
-    if now_year != '2024':
-        now_retriever = retriever_old.get_ensemble_retriever()
-    else:
-        now_retriever = retriever.get_ensemble_retriever()
+    now_retriever = retriever.get_ensemble_retriever()
     docs = now_retriever.invoke(prompt)
     stream = qa_chain.stream(
         {
@@ -137,7 +123,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
     used_team_code = [i.strip() for i in response.split('|')[1:]]
 
     if len(used_team_code) == 1 and 'None' not in used_team_code:
-        used_doc = find_document(docs, used_team_code[0], now_year)
+        used_doc = find_document(docs, used_team_code[0], 2024)
         used_doc_vid = used_doc.metadata['Youtube link']
 
         play_video = lambda: st.session_state.messages.append({"role": "video", "content": used_doc_vid})
@@ -147,9 +133,6 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
         with col1:
             st.button('팀 영상 보기', on_click=play_video)
-        if now_year == '2024':
-            with col2:
-                st.button('팀 위치 보기', on_click=show_loc_img)
 
     st.session_state.messages.append({"role": "assistant", "content": response})        
     now = datetime.now() + timedelta(hours=9)
