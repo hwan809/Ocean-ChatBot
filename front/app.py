@@ -103,19 +103,18 @@ for i in range(len(st.session_state.messages)):
         with st.chat_message(name="assistant", avatar='🐋'):
             st.image(message["content"], width=360)
     elif message["role"] == "button":
-        with st.chat_message(name="assistant", avatar='🐋'):
-            col1, col2, col3 = st.columns([1, 1, 3])
-            if type(message["content"]) == list:
-                with col1:
-                    st.button('팀 영상 보기', on_click=message["content"][0], key=key)
-                    key += 1
-                with col2:
-                    st.button('팀 위치 보기', on_click=message["content"][1], key=key)
-                    key += 1
-            else:
-                with col1:
-                    st.button('팀 영상 보기', on_click=message["content"], key=key)
-                    key += 1
+        col1, col2, col3 = st.columns([1, 1, 3])
+        if type(message["content"]) == list:
+            with col1:
+                st.button('팀 영상 보기', on_click=message["content"][0], key=key)
+                key += 1
+            with col2:
+                st.button('팀 위치 보기', on_click=message["content"][1], key=key)
+                key += 1
+        else:
+            with col1:
+                st.button('팀 영상 보기', on_click=message["content"], key=key)
+                key += 1
     else:
         with st.chat_message(name="user"):
             st.markdown(message["content"])
