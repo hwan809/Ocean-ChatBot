@@ -31,7 +31,6 @@ from langchain.chains.query_constructor.base import (
 
 openai_api_key = st.secrets['OPENAI_API_KEY']
 llm = ChatOpenAI(model_name="gpt-4o", temperature=0, openai_api_key=openai_api_key)
-key = 0
 
 @st.cache_resource
 def setup_rag_pipeline():
@@ -102,16 +101,16 @@ for i in range(len(st.session_state.messages)):
     elif message["role"] == "image":
         with st.chat_message(name="assistant", avatar='🐋'):
             st.image(message["content"], width=360)
-    elif message["role"] == "button":
-        col1, col2, col3 = st.columns([1, 1, 3])
-        if type(message["content"]) == list:
-            with col1:
-                st.button('팀 영상 보기', on_click=message["content"][0][0], key=message["content"][0][1])
-            with col2:
-                st.button('팀 위치 보기', on_click=message["content"][1][0], key=message["content"][1][1])
-        else:
-            with col1:
-                st.button('팀 영상 보기', on_click=message["content"][0], key=message["content"][1])
+    # elif message["role"] == "button":
+    #     col1, col2, col3 = st.columns([1, 1, 3])
+    #     if type(message["content"]) == list:
+    #         with col1:
+    #             st.button('팀 영상 보기', on_click=message["content"][0][0], key=message["content"][0][1])
+    #         with col2:
+    #             st.button('팀 위치 보기', on_click=message["content"][1][0], key=message["content"][1][1])
+    #     else:
+    #         with col1:
+    #             st.button('팀 영상 보기', on_click=message["content"][0], key=message["content"][1])
     else:
         with st.chat_message(name="user"):
             st.markdown(message["content"])
@@ -154,16 +153,10 @@ if prompt := st.chat_input("질문을 입력하세요"):
     
         col1, col2, col3 = st.columns([1, 1, 3])
         with col1:
-            st.button('팀 영상 보기', on_click=play_video, key=key)
-            st.session_state.messages.append({"role": "button", "content": (play_video, key)})
-
-            key += 1
+            st.button('팀 영상 보기', on_click=play_video)
         if now_year == '2024':
             with col2:
-                st.button('팀 위치 보기', on_click=show_loc_img, key=key)
-                st.session_state.messages.append({"role": "button", "content": [(play_video, key), (show_loc_img, key + 1)]})
-
-                key += 2
+                st.button('팀 위치 보기', on_click=show_loc_img)
         
     now = datetime.now() + timedelta(hours=9)
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
