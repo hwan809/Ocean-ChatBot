@@ -85,6 +85,7 @@ qa_chain = setup_rag_pipeline()
 googlesheet = GooglesheetUtils()
 
 used_doc_vid = ''
+key = 0
 
 # Chat interface
 if "messages" not in st.session_state:
@@ -92,7 +93,6 @@ if "messages" not in st.session_state:
 
 for i in range(len(st.session_state.messages)):
     message = st.session_state.messages[i]
-    key = 0
     if message["role"] == "assistant":
         with st.chat_message(name="assistant", avatar='🐋'):
             st.markdown(message["content"])
@@ -158,11 +158,13 @@ if prompt := st.chat_input("질문을 입력하세요"):
         col1, col2, col3 = st.columns([1, 1, 3])
 
         with col1:
-            st.button('팀 영상 보기', on_click=play_video)
+            st.button('팀 영상 보기', on_click=play_video, key=key)
+            key += 1
             st.session_state.messages.append({"role": "button", "content": play_video})
         if now_year == '2024':
             with col2:
-                st.button('팀 위치 보기', on_click=show_loc_img)
+                st.button('팀 위치 보기', on_click=show_loc_img, key=key)
+                key += 1
                 st.session_state.messages.append({"role": "button", "content": [play_video, show_loc_img]})
 
     st.session_state.messages.append({"role": "assistant", "content": response})        
