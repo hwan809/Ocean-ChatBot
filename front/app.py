@@ -138,9 +138,9 @@ if prompt := st.chat_input("질문을 입력하세요"):
         used_doc_vid = used_doc.metadata['Youtube link']
         show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code[0])})
     
-        col1, col2, col3 = st.columns([1, 4])
+        col1, col2 = st.columns([1, 4])
         if now_year == '2024':
-            with col2:
+            with col1:
                 st.button('팀 위치 보기', on_click=show_loc_img)
         
     now = datetime.now() + timedelta(hours=9)
