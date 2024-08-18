@@ -143,7 +143,6 @@ def get_location_image(team_code):
     team_cord = booth[team_code]
 
     img = arrow(team_cord[0], team_cord[1], team_cord[2])
-    img2 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    return img2
+    return img
 
 
