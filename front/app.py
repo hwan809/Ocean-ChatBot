@@ -150,6 +150,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
         values = [[prompt, response, timestamp]]
         googlesheet.append_data(values, 'Sheet1!A1')
-    except Exception:
+    except Exception as e:
         with st.chat_message(name="assistant", avatar='🐋'):
-            response = st.markdown('다시 시도해 주세요!')
+            response = st.markdown('다시 시도해 주세요!\n')
+            st.markdown(e)
