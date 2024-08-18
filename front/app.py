@@ -153,7 +153,6 @@ if prompt := st.chat_input("질문을 입력하세요"):
         show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code[0])})
     
         col1, col2, col3 = st.columns([1, 1, 3])
-        key += 2
         with col1:
             st.button('팀 영상 보기', on_click=play_video, key=key)
             st.session_state.messages.append({"role": "button", "content": (play_video, key)})
@@ -162,9 +161,9 @@ if prompt := st.chat_input("질문을 입력하세요"):
         if now_year == '2024':
             with col2:
                 st.button('팀 위치 보기', on_click=show_loc_img, key=key)
-                st.session_state.messages.append({"role": "button", "content": [(play_video, key), (show_loc_img, key)]})
+                st.session_state.messages.append({"role": "button", "content": [(play_video, key), (show_loc_img, key + 1)]})
 
-                key += 1
+                key += 2
         
     now = datetime.now() + timedelta(hours=9)
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
