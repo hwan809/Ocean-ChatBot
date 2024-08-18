@@ -92,6 +92,7 @@ if "messages" not in st.session_state:
 
 for i in range(len(st.session_state.messages)):
     message = st.session_state.messages[i]
+    key = 0
     if message["role"] == "assistant":
         with st.chat_message(name="assistant", avatar='🐋'):
             st.markdown(message["content"])
@@ -106,16 +107,18 @@ for i in range(len(st.session_state.messages)):
             col1, col2, col3 = st.columns([1, 1, 3])
             if type(message["content"]) == list:
                 with col1:
-                    st.button('팀 영상 보기', on_click=message["content"][0])
+                    st.button('팀 영상 보기', on_click=message["content"][0], key=key)
+                    key += 1
                 with col2:
-                    st.button('팀 위치 보기', on_click=message["content"][1])
+                    st.button('팀 위치 보기', on_click=message["content"][1], key=key)
+                    key += 1
             else:
                 with col1:
-                    st.button('팀 영상 보기', on_click=message["content"])
+                    st.button('팀 영상 보기', on_click=message["content"], key=key)
+                    key += 1
     else:
         with st.chat_message(name="user"):
             st.markdown(message["content"])
-        
 
 if prompt := st.chat_input("질문을 입력하세요"):
     st.session_state.messages.append({"role": "user", "content": prompt})
