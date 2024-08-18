@@ -153,8 +153,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
         show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code[0])})
     
         col1, col2, col3 = st.columns([1, 1, 3])
-        key += 1
-
+        key += 2
         with col1:
             st.button('팀 영상 보기', on_click=play_video, key=key)
             st.session_state.messages.append({"role": "button", "content": (play_video, key)})
