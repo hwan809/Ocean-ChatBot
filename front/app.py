@@ -160,12 +160,10 @@ if prompt := st.chat_input("질문을 입력하세요"):
         with col1:
             st.button('팀 영상 보기', on_click=play_video, key=key)
             key += 1
-            st.session_state.messages.append({"role": "button", "content": play_video})
         if now_year == '2024':
             with col2:
                 st.button('팀 위치 보기', on_click=show_loc_img, key=key)
                 key += 1
-                st.session_state.messages.append({"role": "button", "content": [play_video, show_loc_img]})
         
     now = datetime.now() + timedelta(hours=9)
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
