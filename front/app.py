@@ -110,42 +110,46 @@ if prompt := st.chat_input("질문을 입력하세요"):
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    now_retriever = None
-    find_year = YearDistribution("gpt-4o")
-    now_year = find_year.Year(prompt).replace('\n', '').strip()
+    try:
+        now_retriever = None
+        find_year = YearDistribution("gpt-4o")
+        now_year = find_year.Year(prompt).replace('\n', '').strip()
 
-    print(now_year)
+        print(now_year)
 
-    if now_year != '2024':
-        now_retriever = retriever_old.get_ensemble_retriever()
-    else:
-        now_retriever = retriever.get_ensemble_retriever()
-    docs = now_retriever.invoke(prompt)
-    stream = qa_chain.stream(
-        {
-            "context": docs,
-            "question": prompt
-        }
-    )
+        if now_year != '2024':
+            now_retriever = retriever_old.get_ensemble_retriever()
+        else:
+            now_retriever = retriever.get_ensemble_retriever()
+        docs = now_retriever.invoke(prompt)
+        stream = qa_chain.stream(
+            {
+                "context": docs,
+                "question": prompt
+            }
+        )
 
-    with st.chat_message(name="assistant", avatar='🐋'):
-        response = st.write_stream(stream)
+        with st.chat_message(name="assistant", avatar='🐋'):
+            response = st.write_stream(stream)
 
-    used_team_code = [i.strip() for i in response.split('|')[1:]]
-    st.session_state.messages.append({"role": "assistant", "content": response})
+        used_team_code = [i.strip() for i in response.split('|')[1:]]
+        st.session_state.messages.append({"role": "assistant", "content": response})
 
-    if len(used_team_code) == 1 and 'None' not in used_team_code:
-        used_doc = find_document(docs, used_team_code[0], now_year)
-        used_doc_vid = used_doc.metadata['Youtube link']
-        show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code[0])})
-    
-        col1, col2 = st.columns([1, 4])
-        if now_year == '2024':
-            with col1:
-                st.button('팀 위치 보기', on_click=show_loc_img)
+        if len(used_team_code) == 1 and 'None' not in used_team_code:
+            used_doc = find_document(docs, used_team_code[0], now_year)
+            used_doc_vid = used_doc.metadata['Youtube link']
+            show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code[0])})
         
-    now = datetime.now() + timedelta(hours=9)
-    timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
+            col1, col2 = st.columns([1, 4])
+            if now_year == '2024':
+                with col1:
+                    st.button('팀 위치 보기', on_click=show_loc_img)
+            
+        now = datetime.now() + timedelta(hours=9)
+        timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
-    values = [[prompt, response, timestamp]]
-    googlesheet.append_data(values, 'Sheet1!A1')
+        values = [[prompt, response, timestamp]]
+        googlesheet.append_data(values, 'Sheet1!A1')
+    except Exception:
+        with st.chat_message(name="assistant", avatar='🐋'):
+            response = st.markdown('다시 시도해 주세요!')
