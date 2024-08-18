@@ -101,8 +101,9 @@ for i in range(len(st.session_state.messages)):
     elif message["role"] == "image":
         with st.chat_message(name="assistant", avatar='🐋'):
             st.image(message["content"], width=360)
-    with st.chat_message(name="user"):
-        st.markdown(message["content"])
+    elif message["role"] == "user":
+        with st.chat_message(name="user"):
+            st.markdown(message["content"])
 
 if prompt := st.chat_input("질문을 입력하세요"):
     st.session_state.messages.append({"role": "user", "content": prompt})
