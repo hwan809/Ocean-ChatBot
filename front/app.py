@@ -100,7 +100,18 @@ for i in range(len(st.session_state.messages)):
             st.video(message["content"])    
     elif message["role"] == "image":
         with st.chat_message(name="assistant", avatar='🐋'):
-            st.image(message["content"], width=360)    
+            st.image(message["content"], width=360)
+    elif message["role"] == "button":
+        with st.chat_message(name="assistant", avatar='🐋'):
+            col1, col2, col3 = st.columns([1, 1, 3])
+            if type(message["content"]) == list:
+                with col1:
+                    st.button('팀 영상 보기', on_click=message["content"][0])
+                with col2:
+                    st.button('팀 위치 보기', on_click=message["content"][1])
+            else:
+                with col1:
+                    st.button('팀 영상 보기', on_click=message["content"])
     else:
         with st.chat_message(name="user"):
             st.markdown(message["content"])
@@ -145,9 +156,11 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
         with col1:
             st.button('팀 영상 보기', on_click=play_video)
+            st.session_state.messages.append({"role": "button", "content": play_video})
         if now_year == '2024':
             with col2:
                 st.button('팀 위치 보기', on_click=show_loc_img)
+                st.session_state.messages.append({"role": "button", "content": [play_video, show_loc_img]})
 
     st.session_state.messages.append({"role": "assistant", "content": response})        
     now = datetime.now() + timedelta(hours=9)
