@@ -31,6 +31,7 @@ from langchain.chains.query_constructor.base import (
 
 openai_api_key = st.secrets['OPENAI_API_KEY']
 llm = ChatOpenAI(model_name="gpt-4o", temperature=0, openai_api_key=openai_api_key)
+key = 0
 
 @st.cache_resource
 def setup_rag_pipeline():
@@ -85,7 +86,6 @@ qa_chain = setup_rag_pipeline()
 googlesheet = GooglesheetUtils()
 
 used_doc_vid = ''
-key = 0
 
 # Chat interface
 if "messages" not in st.session_state:
