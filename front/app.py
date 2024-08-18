@@ -146,6 +146,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
         response = st.write_stream(stream)
 
     used_team_code = [i.strip() for i in response.split('|')[1:]]
+    st.session_state.messages.append({"role": "assistant", "content": response})
 
     if len(used_team_code) == 1 and 'None' not in used_team_code:
         used_doc = find_document(docs, used_team_code[0], now_year)
@@ -165,8 +166,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
                 st.button('팀 위치 보기', on_click=show_loc_img, key=key)
                 key += 1
                 st.session_state.messages.append({"role": "button", "content": [play_video, show_loc_img]})
-
-    st.session_state.messages.append({"role": "assistant", "content": response})        
+        
     now = datetime.now() + timedelta(hours=9)
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
