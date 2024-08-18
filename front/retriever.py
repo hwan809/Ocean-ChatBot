@@ -45,7 +45,6 @@ class CustomRetriever():
             description="A team member's name. name is two or three letters of Hangul.",
             type="string"
         ),
-
         AttributeInfo(
             name="Teammate #1 number",
             description="A team member's student number. The student number is four digits.",
@@ -56,13 +55,41 @@ class CustomRetriever():
             description="A team member's name. name is two or three letters of Hangul.",
             type="string"
         ),
-
         AttributeInfo(
             name="Teammate #2 number",
-            description="A team member's student number. The student number is four digits",
+            description="A team member's student number. The student number is four digits.",
             type="string"
         ),
-
+        AttributeInfo(
+            name="Teammate #3 name",
+            description="A team member's name. name is two or three letters of Hangul.",
+            type="string"
+        ),
+        AttributeInfo(
+            name="Teammate #3 number",
+            description="A team member's student number. The student number is four digits.",
+            type="string"
+        ),
+        AttributeInfo(
+            name="Physics",
+            description="Whether Physics is used. Can be True or False",
+            type="boolean"
+        ),
+        AttributeInfo(
+            name="Chemistry",
+            description="Whether Chemistry is used. Can be True or False",
+            type="boolean"
+        ),
+        AttributeInfo(
+            name="Biology",
+            description="Whether Biology is used. Can be True or False",
+            type="boolean"
+        ),
+        AttributeInfo(
+            name="EarthScience",
+            description="Whether Earth Science is used. Can be True or False",
+            type="boolean"
+        ),
         AttributeInfo(
             name="Youtube link",
             description="A youtube video link from the team. The vido can be played by clicking on the link.",
@@ -70,7 +97,6 @@ class CustomRetriever():
         )
     ]
     examples = [
-    
         (
             "A23 팀?",
             {
