@@ -41,8 +41,8 @@ class CustomRetriever():
             type="string",
         ),
         AttributeInfo(
-            name="Team name",
-            description="nickname of the team. different from the team name.",
+            name="Team name (팀명)",
+            description="nickname of the team.",
             type="string",
         ),
         AttributeInfo(
