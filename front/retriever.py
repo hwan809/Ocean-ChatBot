@@ -36,13 +36,13 @@ class CustomRetriever():
             type="string",
         ),
         AttributeInfo(
-            name="Title",
-            description="the topic that the team studied/made",
+            name="Team name",
+            description="Unique name that the team has.",
             type="string",
         ),
         AttributeInfo(
-            name="Team name (팀명)",
-            description="nickname of the team.",
+            name="Title",
+            description="the topic that the team studied/made.",
             type="string",
         ),
         AttributeInfo(
@@ -128,13 +128,6 @@ class CustomRetriever():
             {
                 "query": "작품 설명서",
                 "filter": 'or(eq("Year", "2023"), or(eq("Teammate #1 name", "김환"), eq("Teammate #2 name", "김환"))',
-            },
-        ),
-        (
-            "김석현 팀과 김환 팀을 비교해줘",
-            {
-                "query": "작품 설명서",
-                "filter": 'or(eq("Teammate #1 name", "김석현"), eq("Teammate #2 name", "김석현"), eq("Teammate #1 name", "김환"), eq("Teammate #2 name", "김환"))',
             },
         ),
         (

@@ -121,9 +121,9 @@ if prompt := st.chat_input("질문을 입력하세요"):
         print(now_year)
 
         if now_year != '2024':
-            now_retriever = retriever_old.get_ensemble_retriever()
+            now_retriever = retriever_old.get_selfquery_retriever()
         else:
-            now_retriever = retriever.get_ensemble_retriever()
+            now_retriever = retriever.get_selfquery_retriever()
         docs = now_retriever.invoke(prompt)
         stream = qa_chain.stream(
             {
@@ -134,6 +134,8 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
         with st.chat_message(name="assistant", avatar='🐋'):
             response = st.write_stream(stream)
+
+            st.markdown(docs)
 
         used_team_code = [i.strip() for i in response.split('|')[1:]]
         st.session_state.messages.append({"role": "assistant", "content": response})
