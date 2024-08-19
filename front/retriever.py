@@ -41,6 +41,11 @@ class CustomRetriever():
             type="string",
         ),
         AttributeInfo(
+            name="Team name",
+            description="nickname of the team. different from the team name.",
+            type="string",
+        ),
+        AttributeInfo(
             name="Teammate #1 name",
             description="A team member's name. name is two or three letters of Hangul.",
             type="string"
