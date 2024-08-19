@@ -131,6 +131,13 @@ class CustomRetriever():
             },
         ),
         (
+            "김석현 팀과 김환 팀을 비교해줘",
+            {
+                "query": "작품 설명서",
+                "filter": 'or(or(eq("Teammate #1 name", "김석현"), eq("Teammate #2 name", "김석현")), or(eq("Teammate #1 name", "김환"), eq("Teammate #2 name", "김환"))',
+            },
+        ),
+        (
             "환경에 관한 주제로 연구한 팀을 알려줄래?",
             {
                 "query": "환경에 관한 주제로 연구한 팀을 알려줄래?",
@@ -151,6 +158,7 @@ class CustomRetriever():
                 "filter": "NO_FILTER",
             }
         )
+        
     ]
 
     def __init__(self, _vectorstore):
