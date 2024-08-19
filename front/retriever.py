@@ -119,6 +119,13 @@ class CustomRetriever():
             },
         ),
         (
+            "작년에 김환은 뭐했어?",
+            {
+                "query": "작품 설명서",
+                "filter": 'or(eq("Year", "2023"), or(eq("Teammate #1 name", "김환"), eq("Teammate #2 name", "김환"))',
+            },
+        ),
+        (
             "환경에 관한 주제로 연구한 팀을 알려줄래?",
             {
                 "query": "환경에 관한 주제로 연구한 팀을 알려줄래?",
