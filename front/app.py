@@ -139,7 +139,9 @@ if prompt := st.chat_input("질문을 입력하세요"):
             used_doc = find_document(docs, used_team_code[0], now_year)
             used_doc_vid = used_doc.metadata['Youtube link']
             show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code[0])})
-        
+
+            st.video(used_doc_vid)
+
             col1, col2 = st.columns([1, 4])
             if now_year == '2024':
                 with col1:
