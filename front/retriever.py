@@ -134,7 +134,7 @@ class CustomRetriever():
             "김석현 팀과 김환 팀을 비교해줘",
             {
                 "query": "작품 설명서",
-                "filter": 'or(or(eq("Teammate #1 name", "김석현"), eq("Teammate #2 name", "김석현")), or(eq("Teammate #1 name", "김환"), eq("Teammate #2 name", "김환"))',
+                "filter": 'or(eq("Teammate #1 name", "김석현"), eq("Teammate #2 name", "김석현"), eq("Teammate #1 name", "김환"), eq("Teammate #2 name", "김환"))',
             },
         ),
         (
