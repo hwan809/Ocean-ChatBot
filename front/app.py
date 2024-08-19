@@ -141,6 +141,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
             show_loc_img = lambda: st.session_state.messages.append({"role": "image", "content": get_location_image(used_team_code[0])})
 
             st.video(used_doc_vid)
+            st.session_state.messages.append({"role": "video", "content": used_doc_vid})
 
             col1, col2 = st.columns([1, 4])
             if now_year == '2024':
