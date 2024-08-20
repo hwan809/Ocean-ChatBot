@@ -72,7 +72,7 @@ st.title("한바다 🐬")
 st.header("2024 Ocean ICT 챗봇 도우미")
 
 vectorstore = Chroma(
-    persist_directory="db/chroma_2024_pdfs",
+    persist_directory="db/chroma_24_pdfs",
     embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key)
 )
 vectorstore_old = Chroma(
@@ -103,6 +103,7 @@ for i in range(len(st.session_state.messages)):
     elif message["role"] == "image":
         with st.chat_message(name="assistant", avatar='🐋'):
             st.image(message["content"], width=360)
+            st.markdown('*최단거리 알고리즘을 활용한 이미지 생성*')
     elif message["role"] == "user":
         with st.chat_message(name="user"):
             st.markdown(message["content"])
@@ -114,6 +115,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     try:
         now_retriever = None
+        now_query_constructor = None
         find_year = YearDistribution("gpt-4o")
         now_year = find_year.Year(prompt).replace('\n', '').strip()
 
@@ -121,8 +123,10 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
         if now_year != '2024':
             now_retriever = retriever_old.get_ensemble_retriever()
+            now_query_constructor = retriever_old.get_query_constructor()
         else:
             now_retriever = retriever.get_ensemble_retriever()
+            now_query_constructor = retriever.get_query_constructor()
         docs = now_retriever.invoke(prompt)
         stream = qa_chain.stream(
             {
@@ -131,8 +135,14 @@ if prompt := st.chat_input("질문을 입력하세요"):
             }
         )
 
+        query = now_query_constructor.invoke(prompt)
+
         with st.chat_message(name="assistant", avatar='🐋'):
             response = st.write_stream(stream)
+        #     st.markdown(query)
+        
+        # for doc in docs:
+        #     st.markdown('Doc: ' + doc.metadata["Team name"])
 
         used_team_code = [i.strip() for i in response.split('|')[1:]]
         st.session_state.messages.append({"role": "assistant", "content": response})

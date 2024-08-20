@@ -36,13 +36,13 @@ class CustomRetriever():
             type="string",
         ),
         AttributeInfo(
-            name="Title",
-            description="the topic that the team studied/made",
+            name="Team name",
+            description="Unique name that the team has.",
             type="string",
         ),
         AttributeInfo(
-            name="Team name",
-            description="nickname of the team. different from the team name.",
+            name="Title",
+            description="the topic that the team studied/made.",
             type="string",
         ),
         AttributeInfo(
@@ -105,28 +105,35 @@ class CustomRetriever():
         (
             "A23 팀?",
             {
-                "query": "작품 설명서",
+                "query": "A23",
                 "filter": 'eq("Team code", "A23")',
             },
         ),
         (
-            "이동윤은 뭐했어?",
+            "김석현 학생은 뭐했어?",
             {
-                "query": "작품 설명서",
-                "filter": 'or(eq("Teammate #1 name", "이동윤"), eq("Teammate #2 name", "이동윤"))',
+                "query": "김석현",
+                "filter": 'or(eq("Teammate #1 name", "김석현"), eq("Teammate #2 name", "김석현"))',
+            },
+        ),
+        (
+            "고민재 알아?",
+            {
+                "query": "고민재",
+                "filter": 'or(eq("Teammate #1 name", "고민재"), eq("Teammate #2 name", "고민재"))',
             },
         ),
         (
             "화학과 관련된 팀 있어?",
             {
-                "query": "작품 설명서",
+                "query": "화학",
                 "filter": 'eq("Chemistry", True)',
             },
         ),
         (
             "작년에 김환은 뭐했어?",
             {
-                "query": "작품 설명서",
+                "query": "작년, 김환",
                 "filter": 'or(eq("Year", "2023"), or(eq("Teammate #1 name", "김환"), eq("Teammate #2 name", "김환"))',
             },
         ),
@@ -151,6 +158,7 @@ class CustomRetriever():
                 "filter": "NO_FILTER",
             }
         )
+        
     ]
 
     def __init__(self, _vectorstore):
@@ -167,15 +175,18 @@ class CustomRetriever():
         self.self_query_retriever = SelfQueryRetriever(
             query_constructor=self.new_query_constructor,
             vectorstore=self.vectorstore,
-            structured_query_translator=ChromaTranslator()
+            structured_query_translator=ChromaTranslator(),
+            search_kwargs={'k' : 5}
         )
-        self.vectorstore_retriver = self.vectorstore.as_retriever()
+        self.vectorstore_retriver = self.vectorstore.as_retriever(search_kwargs={'k' : 5})
         self.ensemble_retriever = EnsembleRetriever(
             retrievers=[self.self_query_retriever, self.vectorstore_retriver],
             weights=[0.5, 0.5],
             search_type="mmr",
+            search_kwargs={'k' : 10}
         )
     
+    def get_query_constructor(self): return self.new_query_constructor
     def get_selfquery_retriever(self): return self.self_query_retriever
     def get_vectorstore_retriever(self): return self.vectorstore_retriver
     def get_ensemble_retriever(self): return self.ensemble_retriever
