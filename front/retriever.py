@@ -105,35 +105,35 @@ class CustomRetriever():
         (
             "A23 팀?",
             {
-                "query": "작품 설명서",
+                "query": "A23",
                 "filter": 'eq("Team code", "A23")',
             },
         ),
         (
             "이동윤은 뭐했어?",
             {
-                "query": "작품 설명서",
+                "query": "이동윤",
                 "filter": 'or(eq("Teammate #1 name", "이동윤"), eq("Teammate #2 name", "이동윤"))',
             },
         ),
         (
             "이동윤과 김환 팀을 비교해줘",
             {
-                "query": "작품 설명서",
+                "query": "이동윤, 김환",
                 "filter": 'or(eq("Teammate #1 name", "이동윤"), eq("Teammate #2 name", "이동윤"), eq("Teammate #1 name", "김환"), eq("Teammate #2 name", "김환"))',
             },
         ),
         (
             "화학과 관련된 팀 있어?",
             {
-                "query": "작품 설명서",
+                "query": "화학",
                 "filter": 'eq("Chemistry", True)',
             },
         ),
         (
             "작년에 김환은 뭐했어?",
             {
-                "query": "작품 설명서",
+                "query": "작년, 김환",
                 "filter": 'or(eq("Year", "2023"), or(eq("Teammate #1 name", "김환"), eq("Teammate #2 name", "김환"))',
             },
         ),
