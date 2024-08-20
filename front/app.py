@@ -50,7 +50,7 @@ def setup_rag_pipeline():
     예시 답변 2: C05 팀은.. | C05
 
     #질문:
-    {question} 자세하게 답변해줘.
+    부산과학고 Ocean ICT에서 {question} 자세하게 답변해줘.
     #정보:
     2024년에 열린 제 7회 Ocean ICT에는 총 97팀, 201명이 참가하였다. 다음은 참가한 팀들의 포스터 중 질문과 관계된 일부이다.
     {context}
