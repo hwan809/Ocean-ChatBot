@@ -138,10 +138,10 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
         with st.chat_message(name="assistant", avatar='🐋'):
             response = st.write_stream(stream)
-            st.markdown(query)
+        #     st.markdown(query)
         
-        for doc in docs:
-            st.markdown('Doc: ' + doc.metadata["Team name"])
+        # for doc in docs:
+        #     st.markdown('Doc: ' + doc.metadata["Team name"])
 
         used_team_code = [i.strip() for i in response.split('|')[1:]]
         st.session_state.messages.append({"role": "assistant", "content": response})
