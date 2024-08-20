@@ -176,13 +176,13 @@ class CustomRetriever():
             query_constructor=self.new_query_constructor,
             vectorstore=self.vectorstore,
             structured_query_translator=ChromaTranslator(),
+            search_kwargs={'k' : 5}
         )
-        self.vectorstore_retriver = self.vectorstore.as_retriever()
+        self.vectorstore_retriver = self.vectorstore.as_retriever(search_kwargs={'k' : 5})
         self.ensemble_retriever = EnsembleRetriever(
             retrievers=[self.self_query_retriever, self.vectorstore_retriver],
             weights=[0.5, 0.5],
-            search_type="mmr",
-            search_kwargs={"k": 10}            
+            search_type="mmr"          
         )
     
     def get_query_constructor(self): return self.new_query_constructor
