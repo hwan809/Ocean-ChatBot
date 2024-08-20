@@ -176,7 +176,7 @@ class CustomRetriever():
             query_constructor=self.new_query_constructor,
             vectorstore=self.vectorstore,
             structured_query_translator=ChromaTranslator(),  
-            search_kwargs={"k": 3}
+            search_kwargs={"k": 5}
         )
         self.vectorstore_retriver = self.vectorstore.as_retriever()
         self.ensemble_retriever = EnsembleRetriever(
