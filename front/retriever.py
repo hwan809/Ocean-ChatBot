@@ -115,7 +115,7 @@ class CustomRetriever():
                 "query": "이동윤",
                 "filter": 'or(eq("Teammate #1 name", "이동윤"), eq("Teammate #2 name", "이동윤"))',
             },
-        )
+        ),
         (
             "화학과 관련된 팀 있어?",
             {
