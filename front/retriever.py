@@ -110,10 +110,10 @@ class CustomRetriever():
             },
         ),
         (
-            "이동윤 학생은 뭐했어?",
+            "김석현 학생은 뭐했어?",
             {
-                "query": "이동윤",
-                "filter": 'or(eq("Teammate #1 name", "이동윤"), eq("Teammate #2 name", "이동윤"))',
+                "query": "김석현",
+                "filter": 'or(eq("Teammate #1 name", "김석현"), eq("Teammate #2 name", "김석현"))',
             },
         ),
         (
