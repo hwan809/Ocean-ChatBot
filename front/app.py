@@ -102,6 +102,7 @@ for i in range(len(st.session_state.messages)):
     elif message["role"] == "image":
         with st.chat_message(name="assistant", avatar='🐋'):
             st.image(message["content"], width=360)
+            st.markdown('*최단거리 알고리즘을 활용한 이미지 생성*')
     elif message["role"] == "user":
         with st.chat_message(name="user"):
             st.markdown(message["content"])
