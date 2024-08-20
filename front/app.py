@@ -73,7 +73,7 @@ st.title("한바다 🐬")
 st.header("2024 Ocean ICT 챗봇 도우미")
 
 vectorstore = Chroma(
-    persist_directory="db/chroma_2024_pdfs",
+    persist_directory="db/chroma_24_pdfs",
     embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key)
 )
 vectorstore_old = Chroma(
