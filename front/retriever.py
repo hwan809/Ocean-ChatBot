@@ -183,7 +183,7 @@ class CustomRetriever():
             retrievers=[self.self_query_retriever, self.vectorstore_retriver],
             weights=[0.5, 0.5],
             search_type="mmr",
-            search_kwargs={"k": 3}            
+            search_kwargs={"k": 10}            
         )
     
     def get_query_constructor(self): return self.new_query_constructor
