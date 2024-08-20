@@ -115,14 +115,7 @@ class CustomRetriever():
                 "query": "이동윤",
                 "filter": 'or(eq("Teammate #1 name", "이동윤"), eq("Teammate #2 name", "이동윤"))',
             },
-        ),
-        (
-            "이동윤과 김환 팀을 비교해줘",
-            {
-                "query": "이동윤, 김환",
-                "filter": 'or(eq("Teammate #1 name", "이동윤"), eq("Teammate #2 name", "이동윤"), eq("Teammate #1 name", "김환"), eq("Teammate #2 name", "김환"))',
-            },
-        ),
+        )
         (
             "화학과 관련된 팀 있어?",
             {
