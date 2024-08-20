@@ -186,6 +186,7 @@ class CustomRetriever():
             search_kwargs={"k": 3}            
         )
     
+    def get_query_constructor(self): return self.new_query_constructor
     def get_selfquery_retriever(self): return self.self_query_retriever
     def get_vectorstore_retriever(self): return self.vectorstore_retriver
     def get_ensemble_retriever(self): return self.ensemble_retriever

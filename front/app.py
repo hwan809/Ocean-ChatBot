@@ -115,6 +115,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
     try:
         now_retriever = None
+        now_query_constructor = None
         find_year = YearDistribution("gpt-4o")
         now_year = find_year.Year(prompt).replace('\n', '').strip()
 
@@ -122,8 +123,10 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
         if now_year != '2024':
             now_retriever = retriever_old.get_selfquery_retriever()
+            now_query_constructor = retriever_old.get_query_constructor()
         else:
             now_retriever = retriever.get_selfquery_retriever()
+            now_query_constructor = retriever.get_query_constructor()
         docs = now_retriever.invoke(prompt)
         stream = qa_chain.stream(
             {
@@ -132,11 +135,12 @@ if prompt := st.chat_input("질문을 입력하세요"):
             }
         )
 
+        query = now_query_constructor.invoke(prompt)
+
         with st.chat_message(name="assistant", avatar='🐋'):
             response = st.write_stream(stream)
 
-            for doc in docs:
-                st.markdown(doc.metadata)
+            st.markdown(query)
 
         used_team_code = [i.strip() for i in response.split('|')[1:]]
         st.session_state.messages.append({"role": "assistant", "content": response})
