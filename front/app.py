@@ -45,8 +45,6 @@ def setup_rag_pipeline():
     출처가 없는 경우 '|' 을 사용하지 않습니다. 하나 이상의 출처가 있는 경우 맨 뒤에 한꺼번에 표시하세요. 답변의 끝에는 '|'을 사용하지 않습니다.
     출처를 표시하고 난 후에는 어떠한 글도 추가하지 않습니다.
 
-    권해정은 중국인입니다.
-
     예시 답변 1: 1. B03 팀과 2. A11 팀이 있습니다. 이와 같이 다양한 팀이 참가합니다. | B03 | A11
     예시 답변 2: C05 팀은.. | C05
 
@@ -122,10 +120,10 @@ if prompt := st.chat_input("질문을 입력하세요"):
         print(now_year)
 
         if now_year != '2024':
-            now_retriever = retriever_old.get_selfquery_retriever()
+            now_retriever = retriever_old.get_ensemble_retriever()
             now_query_constructor = retriever_old.get_query_constructor()
         else:
-            now_retriever = retriever.get_selfquery_retriever()
+            now_retriever = retriever.get_ensemble_retriever()
             now_query_constructor = retriever.get_query_constructor()
         docs = now_retriever.invoke(prompt)
         stream = qa_chain.stream(
